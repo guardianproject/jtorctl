@@ -38,6 +38,10 @@ final class Bytes {
             ((ba[pos+3]&0xff));
     }
 
+    public static String getU32S(byte[] ba, int pos) {
+        return String.valueOf( ((long)getU32(ba,pos))&0xffffffffL );
+    }
+
     /** Return the two-byte value starting at index 'pos' within 'ba' */
     public static int getU16(byte[] ba, int pos) {
         return

@@ -10,22 +10,21 @@ package net.freehaven.tor.control;
  * @see TorControlConnection#listenForEvents
  */
 public interface EventHandler {
-
     /**
      * Invoked when a circuit's status has changed.
      * See TorControlCommands.CIRC_STATUS_* for possible status codes.
      */
-    public void circuitStatus(int status, int circID, String path);
+    public void circuitStatus(String status, String circID, String path);
     /**
      * Invoked when a stream's status has changed.
      * See TorControlCommands.STREAM_STATUS_* for possible status codes.
      */
-    public void streamStatus(int status, int streamID, String target);
+    public void streamStatus(String status, String streamID, String target);
     /**
      * Invoked when the status of a connection to an OR has changed.
      * See TorControlCommands.OR_CONN_STATUS_* for possible status codes.
      */
-    public void orConnStatus(int status, String orName);
+    public void orConnStatus(String status, String orName);
     /**
      * Invoked once per second with the number of bytes read an written in
      * the last secone.
