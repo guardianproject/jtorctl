@@ -137,22 +137,8 @@ public class Main implements TorControlCommands {
 
     public static void signal(String[] args) throws IOException {
         // Usage signal [reload|shutdown|dump|debug|halt]
-        TorControlConnection conn = getConnection(args);
-        byte sig;
-        if (args[1].equals("reload"))
-            sig = SIGNAL_HUP;
-        else if (args[1].equals("shutdown"))
-            sig = SIGNAL_INT;
-        else if (args[1].equals("dump"))
-            sig = SIGNAL_USR1;
-        else if (args[1].equals("debug"))
-            sig = SIGNAL_USR2;
-        else if (args[1].equals("halt"))
-            sig = SIGNAL_TERM;
-        else {
-            System.err.println("Unrecognized signal: "+args[1]);
-            return;
-        }   conn.signal(sig);
+        TorControlConnection conn = getConnection(args, false);
+        conn.signal(args[1].toUpperCase());
     }
 
     public static void authDemo(String[] args) throws IOException {

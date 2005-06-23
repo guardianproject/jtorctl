@@ -3,11 +3,11 @@
 // See LICENSE file for copying information
 package net.freehaven.tor.control.examples;
 
-import net.freehaven.tor.control.*;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import net.freehaven.tor.control.EventHandler;
 
-public class DebuggingEventHandler implements EventHandler, TorControlCommands {
+public class DebuggingEventHandler implements EventHandler {
 
     protected PrintWriter out;
 
@@ -15,17 +15,14 @@ public class DebuggingEventHandler implements EventHandler, TorControlCommands {
         out = p;
     }
 
-    public void circuitStatus(int status, int circID, String path) {
-        out.println("Circuit "+Integer.toHexString(circID)+" is now "+
-                    CIRC_STATUS_NAMES[status]+" (path="+path+")");
+    public void circuitStatus(String status, String circID, String path) {
+        out.println("Circuit "+circID+" is now "+status+" (path="+path+")");
     }
-    public void streamStatus(int status, int streamID, String target) {
-        out.println("Stream "+Integer.toHexString(streamID)+" is now "+
-                    STREAM_STATUS_NAMES[status]+" (target="+target+")");
+    public void streamStatus(String status, String streamID, String target) {
+        out.println("Stream "+streamID+" is now "+status+" (target="+target+")");
     }
-    public void orConnStatus(int status, String orName) {
-        out.println("OR connection to "+orName+" is now "+
-                    OR_CONN_STATUS_NAMES[status]);
+    public void orConnStatus(String status, String orName) {
+        out.println("OR connection to "+orName+" is now "+status);
     }
     public void bandwidthUsed(long read, long written) {
         out.println("Bandwidth usage: "+read+" bytes read; "+
@@ -36,18 +33,12 @@ public class DebuggingEventHandler implements EventHandler, TorControlCommands {
         for (Iterator i = orList.iterator(); i.hasNext(); )
             out.println("   "+i.next());
     }
-    public void message(int type, String msg) {
-        String tp;
-        switch (type) {
-            case EVENT_MSG_INFO: tp = "info"; break;
-            case EVENT_MSG_NOTICE: tp = "notice"; break;
-            case EVENT_MSG_WARN: tp = "warn"; break;
-            case EVENT_MSG_ERROR: tp = "error"; break;
-            default:
-                throw new Error("EventHandler.message() called with bad type: "+
-                                type);
-        }
-        out.println("["+tp+"] "+msg.trim());
+    public void message(String type, String msg) {
+        out.println("["+type+"] "+msg.trim());
+    }
+
+    public void unrecognized(String type, String msg) {
+        out.println("unrecognized event ["+type+"] "+msg.trim());
     }
 
 }
