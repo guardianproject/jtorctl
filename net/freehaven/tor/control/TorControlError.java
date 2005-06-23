@@ -12,11 +12,16 @@ public class TorControlError extends RuntimeException {
         super(s);
         errorType = type;
     }
+    public TorControlError(String s) {
+        this(-1, s);
+    }
     public int getErrorType() {
         return errorType;
     }
     public String getErrorMsg() {
         try {
+            if (errorType == -1)
+                return null;
             return TorControlCommands.ERROR_MSGS[errorType];
         } catch (ArrayIndexOutOfBoundsException ex) {
             return "Unrecongized error #"+errorType;

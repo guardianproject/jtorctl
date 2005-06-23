@@ -41,7 +41,6 @@ public abstract class TorControlConnection// implements TorControlCommands {
         this.waiters = new LinkedList();
     }
 
-
     /** Set the EventHandler object that will be notified of any
      * events Tor delivers to this connection.  To make Tor send us
      * events, call listenForEvents(). */
@@ -155,7 +154,7 @@ public abstract class TorControlConnection// implements TorControlCommands {
      * Tell Tor to extend the circuit identified by 'circID' through the
      * servers named in the list 'path'.
      */
-    public abstract int extendCircuit(String circID, String path) throws IOException;
+    public abstract String extendCircuit(String circID, String path) throws IOException;
 
     /**
      * Tell Tor to attach the stream identified by 'streamID' to the circuit
@@ -173,11 +172,11 @@ public abstract class TorControlConnection// implements TorControlCommands {
 
     /** Tell Tor to close the stream identified by 'streamID'.
      */
-    public abstract void closeStream(String streamID, byte reason, byte flags)
+    public abstract void closeStream(String streamID, byte reason)
         throws IOException;
 
     /** Tell Tor to close the circuit identified by 'streamID'.
      */
-    public abstract void closeCircuit(String circID, byte flags) throws IOException;
+    public abstract void closeCircuit(String circID, boolean ifUnused) throws IOException;
 
 }

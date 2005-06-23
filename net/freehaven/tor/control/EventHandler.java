@@ -37,5 +37,11 @@ public interface EventHandler {
     /**
      * Invoked when Tor logs a message.
      */
-    public void message(int type, String msg);
+    public void message(String severity, String msg);
+    /**
+     * Invoked in an unspecified handler.
+     */
+    public void unrecognized(String type, String msg);
+
 }
+

@@ -27,8 +27,6 @@ public class TorControlConnection0 extends TorControlConnection
         Cmd(int t, int l) { type = t; body = new byte[l]; };
     }
 
-
-
     /** Create a new TorControlConnection to communicate with Tor over
      * a given socket.  After calling this constructor, it is typical to
      * call launchThread and authenticate. */
@@ -222,11 +220,19 @@ public class TorControlConnection0 extends TorControlConnection
               handler.newDescriptors(lst);
               break;
           case EVENT_MSG_DEBUG:
+              handler.message("DEBUG", Bytes.getNulTerminatedStr(c.body, 2));
+              break;
           case EVENT_MSG_INFO:
+              handler.message("INFO", Bytes.getNulTerminatedStr(c.body, 2));
+              break;
           case EVENT_MSG_NOTICE:
+              handler.message("NOTICE", Bytes.getNulTerminatedStr(c.body, 2));
+              break;
           case EVENT_MSG_WARN:
+              handler.message("WARN", Bytes.getNulTerminatedStr(c.body, 2));
+              break;
           case EVENT_MSG_ERROR:
-              handler.message(type, Bytes.getNulTerminatedStr(c.body, 2));
+              handler.message("ERR", Bytes.getNulTerminatedStr(c.body, 2));
               break;
           default:
               throw new TorControlSyntaxError("Unrecognized event type.");
@@ -345,13 +351,13 @@ public class TorControlConnection0 extends TorControlConnection
         return m;
     }
 
-    public int extendCircuit(String circID, String path) throws IOException {
+    public String extendCircuit(String circID, String path) throws IOException {
         byte[] p = path.getBytes();
         byte[] ba = new byte[p.length+4];
         Bytes.setU32(ba, 0, (int)Long.parseLong(circID));
         System.arraycopy(p, 0, ba, 4, p.length);
         Cmd c = sendAndWaitForResponse(CMD_EXTENDCIRCUIT, ba);
-        return Bytes.getU32(c.body, 0);
+        return Integer.toString(Bytes.getU32(c.body, 0));
     }
 
     public void attachStream(String streamID, String circID) 
@@ -381,21 +387,21 @@ public class TorControlConnection0 extends TorControlConnection
 
     /** Tell Tor to close the stream identified by 'streamID'.
      */
-    public void closeStream(String streamID, byte reason, byte flags)
+    public void closeStream(String streamID, byte reason)
         throws IOException {
         byte[] ba = new byte[6];
         Bytes.setU32(ba, 0, (int)Long.parseLong(streamID));
         ba[4] = reason;
-        ba[5] = flags;
+        ba[5] = (byte)0;
         sendAndWaitForResponse(CMD_CLOSESTREAM, ba);
     }
 
     /** Tell Tor to close the circuit identified by 'streamID'.
      */
-    public void closeCircuit(String circID, byte flags) throws IOException {
+    public void closeCircuit(String circID, boolean ifUnused) throws IOException {
         byte[] ba = new byte[5];
         Bytes.setU32(ba, 0, (int)Long.parseLong(circID));
-        ba[4] = flags;
+        ba[4] = (byte)(ifUnused? 1 : 0);
         sendAndWaitForResponse(CMD_CLOSECIRCUIT, ba);
     }
 
