@@ -56,7 +56,6 @@ public class PasswordDigest {
         return hashedKey;
     }
 
-
     /** Parameter used by RFC2440's s2k algorithm. */
     private static final int EXPBIAS = 6;
 
@@ -101,3 +100,4 @@ public class PasswordDigest {
     }
 
 }
+

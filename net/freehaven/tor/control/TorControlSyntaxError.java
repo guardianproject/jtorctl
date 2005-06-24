@@ -6,3 +6,4 @@ package net.freehaven.tor.control;
 public class TorControlSyntaxError extends RuntimeException {
     public TorControlSyntaxError(String s) { super(s); }
 }
+

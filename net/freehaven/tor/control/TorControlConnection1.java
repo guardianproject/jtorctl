@@ -120,7 +120,6 @@ public class TorControlConnection1 extends TorControlConnection
         return reply;
     }
 
-
     /** helper: implement the main background loop. */
     protected void react() throws IOException {
         while (true) {
@@ -142,6 +141,7 @@ public class TorControlConnection1 extends TorControlConnection
         Waiter w = new Waiter();
         synchronized (waiters) {
             output.write(s);
+            output.flush();
             if (rest != null)
                 writeEscaped(rest);
             waiters.addLast(w);
@@ -227,7 +227,7 @@ public class TorControlConnection1 extends TorControlConnection
         ArrayList lst = sendAndWaitForResponse(sb.toString(), null);
         Map result = new HashMap();
         for (Iterator it = lst.iterator(); it.hasNext(); ) {
-            String kv = (String) it.next();
+            String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
             result.put(kv.substring(0, idx),
                        kv.substring(idx+1));
@@ -344,3 +344,4 @@ public class TorControlConnection1 extends TorControlConnection
     }
 
 }
+

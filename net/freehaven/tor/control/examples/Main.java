@@ -49,8 +49,8 @@ public class Main implements TorControlCommands {
     private static TorControlConnection getConnection(String[] args,
                                                       boolean daemon)
         throws IOException {
-        TorControlConnection conn =
-            new TorControlConnection(new java.net.Socket("127.0.0.1", 9100));
+        TorControlConnection conn = TorControlConnection.getConnection(
+                                    new java.net.Socket("127.0.0.1", 9100));
         Thread th = conn.launchThread(daemon);
         conn.authenticate(new byte[0]);
         return conn;
@@ -84,18 +84,20 @@ public class Main implements TorControlCommands {
         // Usage: get-config key key key
         TorControlConnection conn = getConnection(args);
         Map m = conn.getConf(Arrays.asList(args).subList(1,args.length));
-        for (int i = 1; i < args.length; ++i) {
-            System.out.println("KEY: "+args[i]);
-            System.out.println("VAL: "+m.get(args[i]));
+        for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            System.out.println("KEY: "+e.getKey());
+            System.out.println("VAL: "+e.getValue());
         }
     }
 
     public static void getInfo(String[] args) throws IOException {
         TorControlConnection conn = getConnection(args);
         Map m = conn.getInfo(Arrays.asList(args).subList(1,args.length));
-        for (int i = 1; i < args.length; ++i) {
-            System.out.println("KEY: "+args[i]);
-            System.out.println("VAL: "+m.get(args[i]));
+        for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            System.out.println("KEY: "+e.getKey());
+            System.out.println("VAL: "+e.getValue());
         }
     }
 
@@ -145,16 +147,17 @@ public class Main implements TorControlCommands {
 
         PasswordDigest pwd = PasswordDigest.generateDigest();
         java.net.Socket s = new java.net.Socket("127.0.0.1", 9100);
-        TorControlConnection conn = new TorControlConnection(s);
+        TorControlConnection conn = TorControlConnection.getConnection(s);
         conn.launchThread(true);
         conn.authenticate(new byte[0]);
 
         conn.setConf("HashedControlPassword", pwd.getHashedPassword());
 
-        conn =
-            new TorControlConnection(new java.net.Socket("127.0.0.1", 9100));
+        conn = TorControlConnection.getConnection(
+                                    new java.net.Socket("127.0.0.1", 9100));
         conn.launchThread(true);
         conn.authenticate(pwd.getSecret());
     }
 
 }
+

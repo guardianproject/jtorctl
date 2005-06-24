@@ -166,7 +166,6 @@ public class TorControlConnection0 extends TorControlConnection
         return sendAndWaitForResponse(type, cmd, CMD_DONE, CMD_DONE, CMD_DONE, CMD_DONE);
     }
 
-
     protected Cmd sendAndWaitForResponse(short type, byte[] cmd, short exType1)
         throws IOException {
         return sendAndWaitForResponse(type, cmd, exType1, exType1, exType1,
@@ -179,7 +178,6 @@ public class TorControlConnection0 extends TorControlConnection
         return sendAndWaitForResponse(type, cmd, exType1, exType2, exType2,
                                       exType2);
     }
-
 
     protected Cmd sendAndWaitForResponse(short type, byte[] cmd,
                                    short exType1, short exType2, short exType3)
@@ -249,7 +247,6 @@ public class TorControlConnection0 extends TorControlConnection
         }
         sendAndWaitForResponse(CMD_SETCONF, b.toString().getBytes());
     }
-
 
     public Map getConf(Collection keys) throws IOException {
         StringBuffer s = new StringBuffer();
@@ -360,7 +357,7 @@ public class TorControlConnection0 extends TorControlConnection
         return Integer.toString(Bytes.getU32(c.body, 0));
     }
 
-    public void attachStream(String streamID, String circID) 
+    public void attachStream(String streamID, String circID)
         throws IOException {
         byte[] ba = new byte[8];
         Bytes.setU32(ba, 0, (int)Long.parseLong(streamID));
@@ -406,3 +403,4 @@ public class TorControlConnection0 extends TorControlConnection
     }
 
 }
+

@@ -37,6 +37,41 @@ public abstract class TorControlConnection// implements TorControlCommands {
         }
     }
 
+    protected static int detectVersion(java.io.InputStream input,
+                                       java.io.OutputStream output)
+        throws IOException
+    {
+        java.io.DataInputStream dInput = new java.io.DataInputStream(input);
+        byte out[] = { 0, 0, 13, 10 };
+        output.write(out);
+
+        int len = dInput.readUnsignedShort();
+        int tp = dInput.readUnsignedShort();
+        if (tp == 0) {
+            byte err[] = new byte[len];
+            dInput.readFully(err);
+            return 0;
+        } else if ((len & 0xff00) != 0x0a00 &&
+                   (len & 0x00ff) != 0x000a &&
+                   (tp  & 0xff00) != 0x0a00 &&
+                   (tp  & 0x00ff) != 0x000a) {
+            while (input.read() != '\n')
+                ;
+        }
+        return 1;
+    }
+
+    public static TorControlConnection getConnection(java.net.Socket sock)
+        throws IOException
+    {
+        int version = detectVersion(sock.getInputStream(),
+                                    sock.getOutputStream());
+        if (version == 0)
+            return new TorControlConnection0(sock);
+        else
+            return new TorControlConnection1(sock);
+    }
+
     protected TorControlConnection() {
         this.waiters = new LinkedList();
     }
@@ -70,7 +105,6 @@ public abstract class TorControlConnection// implements TorControlCommands {
     }
 
     protected abstract void react() throws IOException;
-
 
     /** Change the value of the configuration option 'key' to 'val'.
      */
@@ -180,3 +214,4 @@ public abstract class TorControlConnection// implements TorControlCommands {
     public abstract void closeCircuit(String circID, boolean ifUnused) throws IOException;
 
 }
+
