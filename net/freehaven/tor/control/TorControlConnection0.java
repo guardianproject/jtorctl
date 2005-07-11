@@ -133,6 +133,7 @@ public class TorControlConnection0 extends TorControlConnection
      * to be received (in order) */
     protected synchronized Cmd _sendAndWaitForResponse(short type, byte[] cmd)
         throws IOException {
+        checkThread();
         Waiter w = new Waiter();
         synchronized (waiters) {
             sendCommand(type, cmd);

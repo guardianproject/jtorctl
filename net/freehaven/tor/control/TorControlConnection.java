@@ -19,6 +19,8 @@ public abstract class TorControlConnection// implements TorControlCommands {
 
     protected LinkedList waiters;
 
+    protected Thread thread;
+
     static class Waiter {
         Object response;
         public synchronized Object getResponse() {
@@ -78,7 +80,7 @@ public abstract class TorControlConnection// implements TorControlCommands {
 
     /** Set the EventHandler object that will be notified of any
      * events Tor delivers to this connection.  To make Tor send us
-     * events, call listenForEvents(). */
+     * events, call setEvents(). */
     public void setEventHandler(EventHandler handler) {
         this.handler = handler;
     }
@@ -101,7 +103,13 @@ public abstract class TorControlConnection// implements TorControlCommands {
         if (daemon)
             th.setDaemon(true);
         th.start();
+        this.thread = th;
         return th;
+    }
+
+    protected final void checkThread() {
+        if (thread == null)
+            launchThread(true);
     }
 
     protected abstract void react() throws IOException;

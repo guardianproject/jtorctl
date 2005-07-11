@@ -138,6 +138,7 @@ public class TorControlConnection1 extends TorControlConnection
 
     protected synchronized ArrayList sendAndWaitForResponse(String s,String rest)
         throws IOException {
+        checkThread();
         Waiter w = new Waiter();
         synchronized (waiters) {
             output.write(s);

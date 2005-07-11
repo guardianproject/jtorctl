@@ -7,7 +7,7 @@ package net.freehaven.tor.control;
  * Abstract interface whose methods are invoked when Tor sends us an event.
  *
  * @see TorControlConnection#setEventHandler
- * @see TorControlConnection#listenForEvents
+ * @see TorControlConnection#setEvents
  */
 public interface EventHandler {
     /**
