@@ -7,6 +7,7 @@ import net.freehaven.tor.control.*;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Iterator;
@@ -83,11 +84,11 @@ public class Main implements TorControlCommands {
     public static void getConfig(String[] args) throws IOException {
         // Usage: get-config key key key
         TorControlConnection conn = getConnection(args);
-        Map m = conn.getConf(Arrays.asList(args).subList(1,args.length));
-        for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            System.out.println("KEY: "+e.getKey());
-            System.out.println("VAL: "+e.getValue());
+        List lst = conn.getConf(Arrays.asList(args).subList(1,args.length));
+        for (Iterator i = lst.iterator(); i.hasNext(); ) {
+            ConfigEntry e = (ConfigEntry) i.next();
+            System.out.println("KEY: "+e.key);
+            System.out.println("VAL: "+e.value);
         }
     }
 

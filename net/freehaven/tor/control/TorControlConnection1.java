@@ -218,7 +218,7 @@ public class TorControlConnection1 extends TorControlConnection
         sendAndWaitForResponse(b.toString(), null);
     }
 
-    public Map getConf(Collection keys) throws IOException {
+    public List getConf(Collection keys) throws IOException {
         StringBuffer sb = new StringBuffer("GETCONF");
         for (Iterator it = keys.iterator(); it.hasNext(); ) {
             String key = (String) it.next();
@@ -226,12 +226,12 @@ public class TorControlConnection1 extends TorControlConnection
         }
         sb.append("\r\n");
         ArrayList lst = sendAndWaitForResponse(sb.toString(), null);
-        Map result = new HashMap();
+        ArrayList result = new ArrayList();
         for (Iterator it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
-            result.put(kv.substring(0, idx),
-                       kv.substring(idx+1));
+            result.add(new ConfigEntry(kv.substring(0, idx),
+                                       kv.substring(idx+1)));
         }
         return result;
     }

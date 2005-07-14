@@ -249,7 +249,7 @@ public class TorControlConnection0 extends TorControlConnection
         sendAndWaitForResponse(CMD_SETCONF, b.toString().getBytes());
     }
 
-    public Map getConf(Collection keys) throws IOException {
+    public List getConf(Collection keys) throws IOException {
         StringBuffer s = new StringBuffer();
         for (Iterator it = keys.iterator(); it.hasNext(); ) {
             String key = (String) it.next();
@@ -259,12 +259,12 @@ public class TorControlConnection0 extends TorControlConnection
                                        CMD_CONFVALUE);
         List lines = new ArrayList();
         Bytes.splitStr(lines, c.body, 0, (byte)'\n');
-        Map result = new HashMap();
+        List result = new ArrayList();
         for (Iterator it = lines.iterator(); it.hasNext(); ) {
             String kv = (String) it.next();
             int idx = kv.indexOf(' ');
-            result.put(kv.substring(0, idx),
-                       kv.substring(idx+1));
+            result.add(new ConfigEntry(kv.substring(0, idx),
+                                       kv.substring(idx+1)));
         }
         return result;
     }

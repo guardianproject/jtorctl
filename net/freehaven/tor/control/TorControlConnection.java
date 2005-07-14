@@ -15,6 +15,12 @@ import java.util.Map;
 /** A connection to a running Tor process. */
 public abstract class TorControlConnection// implements TorControlCommands {
 {
+    public static class ConfigEntry {
+        public ConfigEntry(String k, String v) { key = k; value = v; }
+        public final String key;
+        public final String value;
+    }
+
     protected EventHandler handler;
 
     protected LinkedList waiters;
@@ -137,15 +143,14 @@ public abstract class TorControlConnection// implements TorControlCommands {
     public abstract void setConf(Collection kvList) throws IOException;
 
     /** Return the value of the configuration option 'key' */
-    public String getConf(String key) throws IOException {
+    public List getConf(String key) throws IOException {
         List lst = new ArrayList();
         lst.add(key);
-        Map r = getConf(lst);
-        return (String) r.get(key);
+        return getConf(lst);
     }
 
     /** Return a key-value map for the configuration options in 'keys' */
-    public abstract Map getConf(Collection keys) throws IOException;
+    public abstract List getConf(Collection keys) throws IOException;
 
     /** Tell Tor to begin sending us events of the types listed in 'events'.
      * Elements must be one of the EVENT_* values from TorControlCommands */
