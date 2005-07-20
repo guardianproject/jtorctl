@@ -52,10 +52,10 @@ public class Main implements TorControlCommands {
         throws IOException {
         TorControlConnection conn = TorControlConnection.getConnection(
                                     new java.net.Socket("127.0.0.1", 9100));
-        if (conn instanceof TorControlConnection1) {
-            System.err.println("Debugging");
-            ((TorControlConnection1)conn).setDebugging(System.err);
-        }
+        //if (conn instanceof TorControlConnection1) {
+        //    System.err.println("Debugging");
+        //    ((TorControlConnection1)conn).setDebugging(System.err);
+        //}
         Thread th = conn.launchThread(daemon);
         conn.authenticate(new byte[0]);
         return conn;
@@ -111,31 +111,7 @@ public class Main implements TorControlCommands {
         TorControlConnection conn = getConnection(args, false);
         ArrayList lst = new ArrayList();
         for (int i = 1; i < args.length; ++i) {
-            short s = -1;
-            if (args[i].equals("circ"))
-                s = EVENT_CIRCSTATUS;
-            else if (args[i].equals("stream"))
-                s = EVENT_STREAMSTATUS;
-            else if (args[i].equals("orconn"))
-                s = EVENT_ORCONNSTATUS;
-            else if (args[i].equals("bw"))
-                s = EVENT_BANDWIDTH;
-            else if (args[i].equals("newdesc"))
-                s = EVENT_NEWDESCRIPTOR;
-            else if (args[i].equals("info"))
-                s = EVENT_MSG_INFO;
-            else if (args[i].equals("notice"))
-                s = EVENT_MSG_NOTICE;
-            else if (args[i].equals("warn"))
-                s = EVENT_MSG_WARN;
-            else if (args[i].equals("error"))
-                s = EVENT_MSG_ERROR;
-            else {
-                System.err.println("Unrecognized event type: "+args[i]);
-                continue;
-            }
-            lst.add(new Integer(s));
-
+            lst.add(args[i]);
         }
         conn.setEventHandler(
             new DebuggingEventHandler(new PrintWriter(System.out, true)));

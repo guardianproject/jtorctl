@@ -274,8 +274,22 @@ public class TorControlConnection0 extends TorControlConnection
         int i;
         Iterator it;
         for(i=0, it = events.iterator(); it.hasNext(); i += 2) {
-            short event = ((Number)it.next()).shortValue();
-            Bytes.setU16(ba, i, event);
+            Object event = it.next();
+            short e = -1;
+            if (event instanceof Number) {
+                e = ((Number)event).shortValue();
+            } else {
+                String s = ((String) event).toUpperCase();
+                for (int j = 0; i < EVENT_NAMES.length; ++i) {
+                    if (EVENT_NAMES[j].equals(s)) {
+                        e = (short)j;
+                        break;
+                    }
+                }
+                if (e < 0)
+                    throw new Error("Unknown v0 code for event '"+s+"'");
+            }
+            Bytes.setU16(ba, i, e);
         }
         sendAndWaitForResponse(CMD_SETEVENTS, ba);
         System.out.println("OK");
