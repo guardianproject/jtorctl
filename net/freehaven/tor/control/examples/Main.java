@@ -52,6 +52,10 @@ public class Main implements TorControlCommands {
         throws IOException {
         TorControlConnection conn = TorControlConnection.getConnection(
                                     new java.net.Socket("127.0.0.1", 9100));
+        if (conn instanceof TorControlConnection1) {
+            System.err.println("Debugging");
+            ((TorControlConnection1)conn).setDebugging(System.err);
+        }
         Thread th = conn.launchThread(daemon);
         conn.authenticate(new byte[0]);
         return conn;

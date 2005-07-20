@@ -65,6 +65,21 @@ public interface TorControlCommands {
     public static final short EVENT_MSG_WARN = 0x000A;
     public static final short EVENT_MSG_ERROR = 0x000B;
 
+    public static final String[] EVENT_NAMES = {
+        "(0)",
+        "CIRC",
+        "STREAM",
+        "ORCONN",
+        "BW",
+        "OLDLOG",
+        "NEWDESC",
+        "DEBUG",
+        "INFO",
+        "NOTICE",
+        "WARN",
+        "ERR",
+    };
+
     public static final byte CIRC_STATUS_LAUNCHED = 0x01;
     public static final byte CIRC_STATUS_BUILT = 0x02;
     public static final byte CIRC_STATUS_EXTENDED = 0x03;

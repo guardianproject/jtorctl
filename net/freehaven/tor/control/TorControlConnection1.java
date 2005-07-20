@@ -70,10 +70,12 @@ public class TorControlConnection1 extends TorControlConnection
             else
                 line += "\r\n";
             if (debugOutput != null)
-                debugOutput.print("<< "+line);
+                debugOutput.print(">> "+line);
             output.write(line);
         }
         output.write(".\r\n");
+        if (debugOutput != null)
+            debugOutput.print(">> .\n");
     }
 
     protected static final String quote(String s) {
@@ -100,7 +102,7 @@ public class TorControlConnection1 extends TorControlConnection
         do {
             String line = input.readLine();
             if (debugOutput != null)
-                debugOutput.print(">> "+line);
+                debugOutput.println("<< "+line);
             if (line.length() < 4)
                 throw new TorControlSyntaxError("Line (\""+line+"\") too short");
             String status = line.substring(0,3);
@@ -112,7 +114,7 @@ public class TorControlConnection1 extends TorControlConnection
                 while (true) {
                     line = input.readLine();
                     if (debugOutput != null)
-                        debugOutput.print(">> "+line);
+                        debugOutput.print("<< "+line);
                     if (line.equals("."))
                         break;
                     else if (line.startsWith("."))
@@ -148,7 +150,7 @@ public class TorControlConnection1 extends TorControlConnection
         checkThread();
         Waiter w = new Waiter();
         if (debugOutput != null)
-            debugOutput.println("<< "+s);
+            debugOutput.print(">> "+s);
         synchronized (waiters) {
             output.write(s);
             output.flush();
@@ -231,10 +233,10 @@ public class TorControlConnection1 extends TorControlConnection
         if (w instanceof java.io.PrintWriter)
             debugOutput = (java.io.PrintWriter) w;
         else
-            debugOutput = new java.io.PrintWriter(w);
+            debugOutput = new java.io.PrintWriter(w, true);
     }
     public void setDebugging(java.io.PrintStream s) {
-        debugOutput = new java.io.PrintWriter(s);
+        debugOutput = new java.io.PrintWriter(s, true);
     }
 
     public List getConf(Collection keys) throws IOException {
@@ -258,8 +260,13 @@ public class TorControlConnection1 extends TorControlConnection
     public void setEvents(List events) throws IOException {
         StringBuffer sb = new StringBuffer("SETEVENTS");
         for (Iterator it = events.iterator(); it.hasNext(); ) {
-            String event = (String) it.next();
-            sb.append(" ").append(event);
+            Object event = it.next();
+            if (event instanceof String) {
+                sb.append(" ").append((String)event);
+            } else {
+                int i = ((Number) event).intValue();
+                sb.append(" ").append(EVENT_NAMES[i]);
+            }
         }
         sb.append("\r\n");
         sendAndWaitForResponse(sb.toString(), null);
