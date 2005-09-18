@@ -287,7 +287,7 @@ public class TorControlConnection0 extends TorControlConnection
                     }
                 }
                 if (e < 0)
-                    throw new Error("Unknown v0 code for event '"+s+"'");
+                    throw new TorControlError("Unknown v0 code for event '"+s+"'");
             }
             Bytes.setU16(ba, i, e);
         }
@@ -311,15 +311,15 @@ public class TorControlConnection0 extends TorControlConnection
         if (signal.equals("HUP") || signal.equals("RELOAD"))
             sig = SIGNAL_HUP;
         else if (signal.equals("INT") || signal.equals("SHUTDOWN"))
-            sig = SIGNAL_HUP;
+            sig = SIGNAL_INT;
         else if (signal.equals("USR1") || signal.equals("DUMP"))
-            sig = SIGNAL_HUP;
+            sig = SIGNAL_USR1;
         else if (signal.equals("USR2") || signal.equals("DEBUG"))
-            sig = SIGNAL_HUP;
+            sig = SIGNAL_USR2;
         else if (signal.equals("TERM") || signal.equals("HALT"))
-            sig = SIGNAL_HUP;
+            sig = SIGNAL_TERM;
         else
-            throw new Error("Unrecognized value for signal()");
+            throw new TorControlError("Unrecognized value for signal()");
         byte[] ba = { (byte)sig };
         sendAndWaitForResponse(CMD_SIGNAL, ba);
     }
