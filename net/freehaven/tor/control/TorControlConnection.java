@@ -141,6 +141,11 @@ public abstract class TorControlConnection// implements TorControlCommands {
      * 'kvList'.  (The format is "key value"). */
     public abstract void setConf(Collection kvList) throws IOException;
 
+    /** Try to reset the values listed in the collection 'keys' to their
+     * default values.
+     **/
+    public abstract void resetConf(Collection keys) throws IOException;
+
     /** Return the value of the configuration option 'key' */
     public List getConf(String key) throws IOException {
         List lst = new ArrayList();

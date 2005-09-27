@@ -249,6 +249,10 @@ public class TorControlConnection0 extends TorControlConnection
         sendAndWaitForResponse(CMD_SETCONF, b.toString().getBytes());
     }
 
+    public void resetConf(Collection keylist) throws IOException {
+        setConf(keylist);
+    }
+
     public List getConf(Collection keys) throws IOException {
         StringBuffer s = new StringBuffer();
         for (Iterator it = keys.iterator(); it.hasNext(); ) {

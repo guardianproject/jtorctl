@@ -249,6 +249,18 @@ public class TorControlConnection1 extends TorControlConnection
         sendAndWaitForResponse(b.toString(), null);
     }
 
+    public void resetConf(Collection keys) throws IOException {
+        if (keys.size() == 0)
+            return;
+        StringBuffer b = new StringBuffer("RESETCONF");
+        for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            String key = (String) it.next();
+            b.append(" ").append(key);
+        }
+        b.append("\r\n");
+        sendAndWaitForResponse(b.toString(), null);
+    }
+
     /** Sets <b>w</b> as the PrintWriter for debugging output, 
     * which writes out all messages passed between Tor and the controller.  
     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
