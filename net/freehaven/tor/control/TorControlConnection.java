@@ -14,11 +14,6 @@ import java.util.Map;
 /** A connection to a running Tor process. */
 public abstract class TorControlConnection// implements TorControlCommands {
 {
-    public static class ConfigEntry {
-        public ConfigEntry(String k, String v) { key = k; value = v; }
-        public final String key;
-        public final String value;
-    }
 
     protected EventHandler handler;
 
