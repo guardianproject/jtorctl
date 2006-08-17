@@ -380,7 +380,7 @@ public class TorControlConnection1 extends TorControlConnection
     * </ul>
     */
     public void signal(String signal) throws IOException {
-        String cmd = "SIGNAL" + signal + "\r\n";
+        String cmd = "SIGNAL " + signal + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
     /** Tells the Tor server that future SOCKS requests for connections to a set of original
