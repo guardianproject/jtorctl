@@ -86,11 +86,13 @@ final class Bytes {
      * along the character in 'split' and writing them into 'lst'
      */
     public static List splitStr(List lst, String str) {
-        if (lst == null)
-            lst = new ArrayList();
-        StringTokenizer st = new StringTokenizer(str);
-        while (st.hasMoreTokens())
-            lst.add(st.nextToken());
+        // split string on spaces, include trailing/leading
+        String[] tokenArray = str.split(" ", -1);
+        if (lst == null) {
+            lst = Arrays.asList( tokenArray );
+        } else {
+            lst.addAll( Arrays.asList( tokenArray ) );
+        }
         return lst;
     }
 
