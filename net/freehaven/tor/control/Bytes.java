@@ -3,9 +3,8 @@
 // See LICENSE file for copying information
 package net.freehaven.tor.control;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Static class to do bytewise structure manipulation in Java.
