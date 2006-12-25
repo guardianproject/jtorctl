@@ -103,6 +103,18 @@ public class TorControlConnection1 extends TorControlConnection
         char c;
         do {
             String line = input.readLine();
+            if (line == null) {
+                // if line is null, the end of the stream has been reached, i.e.
+                // the connection to Tor has been closed!
+                if (reply.isEmpty()) {
+                        // nothing received so far, can exit cleanly
+                        return reply;
+                } else {
+                        // received half of a reply before the connection broke down
+                        throw new TorControlSyntaxError("Connection to Tor " +
+                                        " broke down while receiving reply!");
+                }
+            }
             if (debugOutput != null)
                 debugOutput.println("<< "+line);
             if (line.length() < 4)
@@ -135,6 +147,10 @@ public class TorControlConnection1 extends TorControlConnection
     protected void react() throws IOException {
         while (true) {
             ArrayList lst = readReply();
+            if (lst.isEmpty()) {
+                // connection has been closed remotely! end the loop!
+                return;
+            }
             if (((ReplyLine)lst.get(0)).status.startsWith("6"))
                 handleEvent(lst);
             else {
@@ -383,6 +399,19 @@ public class TorControlConnection1 extends TorControlConnection
         String cmd = "SIGNAL " + signal + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
+    
+    /** Send a signal to the Tor process to shut it down or halt it.
+     * Does not wait for a response. */
+        public void shutdownTor(String signal) throws IOException {
+                String s = "SIGNAL " + signal + "\r\n";
+        if (debugOutput != null)
+            debugOutput.print(">> "+s);
+        synchronized (waiters) {
+            output.write(s);
+            output.flush();
+        }        
+        }
+    
     /** Tells the Tor server that future SOCKS requests for connections to a set of original
     * addresses should be replaced with connections to the specified replacement
     * addresses.  Each element of <b>kvLines</b> is a String of the form

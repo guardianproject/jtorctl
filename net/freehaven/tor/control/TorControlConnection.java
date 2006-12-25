@@ -165,6 +165,10 @@ public abstract class TorControlConnection// implements TorControlCommands {
     /** Send a signal to the Tor process. */
     public abstract void signal(String signal) throws IOException;
 
+    /** Send a signal to the Tor process to shut it down or halt it.
+     * Does not wait for a response. */
+        public abstract void shutdownTor(String signal) throws IOException;
+
     /** Tell Tor to replace incoming addresses with those as listed in 'kvLines'.
      */
     public abstract Map mapAddresses(Collection kvLines) throws IOException;

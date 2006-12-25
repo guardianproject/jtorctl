@@ -121,7 +121,13 @@ public class Main implements TorControlCommands {
     public static void signal(String[] args) throws IOException {
         // Usage signal [reload|shutdown|dump|debug|halt]
         TorControlConnection conn = getConnection(args, false);
-        conn.signal(args[1].toUpperCase());
+        // distinguish shutdown signal from other signals
+        if ("SHUTDOWN".equalsIgnoreCase(args[1])
+        		|| "HALT".equalsIgnoreCase(args[1])) {
+        	conn.shutdownTor(args[1].toUpperCase());
+        } else {
+        	conn.signal(args[1].toUpperCase());
+        }
     }
 
     public static void authDemo(String[] args) throws IOException {

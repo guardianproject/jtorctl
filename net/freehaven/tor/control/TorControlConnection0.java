@@ -327,6 +327,12 @@ public class TorControlConnection0 extends TorControlConnection
         byte[] ba = { (byte)sig };
         sendAndWaitForResponse(CMD_SIGNAL, ba);
     }
+    
+    /** Send a signal to the Tor process to shut it down or halt it.
+     * Does not wait for a response. */
+        public void shutdownTor(String signal) throws IOException {
+                throw new RuntimeException("Method is not implemented!");
+        }
 
     public Map mapAddresses(Collection kvLines) throws IOException {
         StringBuffer sb = new StringBuffer();
