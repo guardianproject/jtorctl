@@ -4,6 +4,7 @@
 package net.freehaven.tor.control;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,7 +20,7 @@ public abstract class TorControlConnection// implements TorControlCommands {
 
     protected LinkedList waiters;
 
-    protected Thread thread;
+    protected ControlParseThread thread;
 
     static class Waiter {
         Object response;
@@ -91,20 +92,31 @@ public abstract class TorControlConnection// implements TorControlCommands {
      * responses that arrive independantly over the same socket.
      */
     public Thread launchThread(boolean daemon) {
-        Thread th = new Thread() {
-                public void run() {
-                    try {
-                        react();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            };
+    	ControlParseThread th = new ControlParseThread();
         if (daemon)
             th.setDaemon(true);
         th.start();
         this.thread = th;
         return th;
+    }
+
+    protected class ControlParseThread extends Thread {
+    	boolean stopped = false;
+        public void run() {
+            try {
+                react();
+            } catch (SocketException ex) {
+            	if (stopped) // we expected this exception
+                    return;
+                else
+                    throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        public void stopListening() {
+            this.stopped = true;
+        }
     }
 
     protected final void checkThread() {

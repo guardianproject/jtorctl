@@ -7,6 +7,8 @@ package net.freehaven.tor.control;
  * An exception raised when Tor tells us about an error.
  */
 public class TorControlError extends RuntimeException {
+    static final long serialVersionUID = 2;
+
     int errorType;
     public TorControlError(int type, String s) {
         super(s);

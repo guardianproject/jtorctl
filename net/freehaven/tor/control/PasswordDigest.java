@@ -88,11 +88,6 @@ public class PasswordDigest {
         return key;
     }
 
-    private static final char[] NYBBLES = {
-        '0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-    };
-
     /** Return a hexadecimal encoding of a byte array. */
     // XXX There must be a better way to do this in Java.
     private static final String encodeBytes(byte[] ba) {

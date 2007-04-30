@@ -406,6 +406,9 @@ public class TorControlConnection1 extends TorControlConnection
                 String s = "SIGNAL " + signal + "\r\n";
         if (debugOutput != null)
             debugOutput.print(">> "+s);
+        if (this.thread != null) {
+    		this.thread.stopListening();
+    	}
         synchronized (waiters) {
             output.write(s);
             output.flush();

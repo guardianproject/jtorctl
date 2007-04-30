@@ -56,7 +56,7 @@ public class Main implements TorControlCommands {
         //    System.err.println("Debugging");
         //    ((TorControlConnection1)conn).setDebugging(System.err);
         //}
-        Thread th = conn.launchThread(daemon);
+        conn.launchThread(daemon);
         conn.authenticate(new byte[0]);
         return conn;
     }
