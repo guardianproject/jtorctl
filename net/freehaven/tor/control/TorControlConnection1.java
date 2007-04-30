@@ -399,22 +399,24 @@ public class TorControlConnection1 extends TorControlConnection
         String cmd = "SIGNAL " + signal + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
-    
+
     /** Send a signal to the Tor process to shut it down or halt it.
      * Does not wait for a response. */
-        public void shutdownTor(String signal) throws IOException {
-                String s = "SIGNAL " + signal + "\r\n";
+    public void shutdownTor(String signal) throws IOException {
+        String s = "SIGNAL " + signal + "\r\n";
+        Waiter w = new Waiter();
         if (debugOutput != null)
             debugOutput.print(">> "+s);
         if (this.thread != null) {
-    		this.thread.stopListening();
+            this.thread.stopListening();
     	}
         synchronized (waiters) {
             output.write(s);
             output.flush();
-        }        
+            waiters.addLast(w); // Prevent react() from finding the list empty
         }
-    
+    }
+
     /** Tells the Tor server that future SOCKS requests for connections to a set of original
     * addresses should be replaced with connections to the specified replacement
     * addresses.  Each element of <b>kvLines</b> is a String of the form
