@@ -322,8 +322,11 @@ public class TorControlConnection1 extends TorControlConnection
         for (Iterator it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
-            result.add(new ConfigEntry(kv.substring(0, idx),
-                                       kv.substring(idx+1)));
+            if (idx >= 0)
+                result.add(new ConfigEntry(kv.substring(0, idx),
+                                           kv.substring(idx+1)));
+            else
+                result.add(new ConfigEntry(kv));
         }
         return result;
     }
