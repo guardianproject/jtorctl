@@ -59,7 +59,7 @@ public interface EventHandler {
      * Invoked whenever Tor learns about new ORs.  The <b>orList</b> object
      * contains the alphanumeric ServerIDs associated with the new ORs.
      */
-    public void newDescriptors(java.util.List orList);
+    public void newDescriptors(java.util.List<String> orList);
     /**
      * Invoked when Tor logs a message.
      * <b>severity</b> is one of ["DEBUG" | "INFO" | "NOTICE" | "WARN" | "ERR"],

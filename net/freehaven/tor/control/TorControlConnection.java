@@ -20,7 +20,7 @@ public class TorControlConnection implements TorControlCommands
 
     protected EventHandler handler;
 
-    protected LinkedList waiters;
+    protected LinkedList<Waiter> waiters;
 
     protected ControlParseThread thread;
 
@@ -31,8 +31,8 @@ public class TorControlConnection implements TorControlCommands
     protected java.io.PrintWriter debugOutput;
     
     static class Waiter {
-        Object response;
-        public synchronized Object getResponse() {
+        List<ReplyLine> response;
+        public synchronized List<ReplyLine> getResponse() {
             try {
                 while (response == null) {
                     wait();
@@ -42,7 +42,7 @@ public class TorControlConnection implements TorControlCommands
             }
             return response;
         }
-        public synchronized void setResponse(Object response) {
+        public synchronized void setResponse(List<ReplyLine> response) {
             this.response = response;
             notifyAll();
         }
@@ -89,7 +89,7 @@ public class TorControlConnection implements TorControlCommands
         else
             this.input = new java.io.BufferedReader(i);
 
-        this.waiters = new LinkedList();
+        this.waiters = new LinkedList<Waiter>();
     }
 
     protected final void writeEscaped(String s) throws IOException {
@@ -129,8 +129,8 @@ public class TorControlConnection implements TorControlCommands
         return sb.toString();
     }
 
-    protected final ArrayList readReply() throws IOException {
-        ArrayList reply = new ArrayList();
+    protected final ArrayList<ReplyLine> readReply() throws IOException {
+        ArrayList<ReplyLine> reply = new ArrayList<ReplyLine>();
         char c;
         do {
             String line = input.readLine();
@@ -174,7 +174,7 @@ public class TorControlConnection implements TorControlCommands
         return reply;
     }
 
-    protected synchronized ArrayList sendAndWaitForResponse(String s,String rest)
+    protected synchronized ArrayList<ReplyLine> sendAndWaitForResponse(String s,String rest)
         throws IOException {
         checkThread();
         Waiter w = new Waiter();
@@ -187,9 +187,9 @@ public class TorControlConnection implements TorControlCommands
                 writeEscaped(rest);
             waiters.addLast(w);
         }
-        ArrayList lst = (ArrayList) w.getResponse();
-        for (Iterator i = lst.iterator(); i.hasNext(); ) {
-            ReplyLine c = (ReplyLine) i.next();
+        ArrayList<ReplyLine> lst = w.getResponse();
+        for (Iterator<ReplyLine> i = lst.iterator(); i.hasNext(); ) {
+            ReplyLine c = i.next();
             if (! c.status.startsWith("2"))
                 throw new TorControlError("Error reply: "+c.msg);
         }
@@ -198,35 +198,35 @@ public class TorControlConnection implements TorControlCommands
 
     /** Helper: decode a CMD_EVENT command and dispatch it to our
      * EventHandler (if any). */
-    protected void handleEvent(ArrayList events) {
+    protected void handleEvent(ArrayList<ReplyLine> events) {
         if (handler == null)
             return;
 
-        for (Iterator i = events.iterator(); i.hasNext(); ) {
-            ReplyLine line = (ReplyLine) i.next();
+        for (Iterator<ReplyLine> i = events.iterator(); i.hasNext(); ) {
+            ReplyLine line = i.next();
             int idx = line.msg.indexOf(' ');
             String tp = line.msg.substring(0, idx).toUpperCase();
             String rest = line.msg.substring(idx+1);
             if (tp.equals("CIRC")) {
-                List lst = Bytes.splitStr(null, rest);
+                List<String> lst = Bytes.splitStr(null, rest);
                 handler.circuitStatus((String)lst.get(1),
                                       (String)lst.get(0),
                                       (String)lst.get(2));
             } else if (tp.equals("STREAM")) {
-                List lst = Bytes.splitStr(null, rest);
+                List<String> lst = Bytes.splitStr(null, rest);
                 handler.streamStatus((String)lst.get(1),
                                      (String)lst.get(0),
                                      (String)lst.get(3));
                 // XXXX circID.
             } else if (tp.equals("ORCONN")) {
-                List lst = Bytes.splitStr(null, rest);
+                List<String> lst = Bytes.splitStr(null, rest);
                 handler.orConnStatus((String)lst.get(1), (String)lst.get(0));
             } else if (tp.equals("BW")) {
-                List lst = Bytes.splitStr(null, rest);
+                List<String> lst = Bytes.splitStr(null, rest);
                 handler.bandwidthUsed(Integer.parseInt((String)lst.get(0)),
                                       Integer.parseInt((String)lst.get(1)));
             } else if (tp.equals("NEWDESC")) {
-                List lst = Bytes.splitStr(null, rest);
+                List<String> lst = Bytes.splitStr(null, rest);
                 handler.newDescriptors(lst);
             } else if (tp.equals("DEBUG") ||
                        tp.equals("INFO") ||
@@ -247,10 +247,7 @@ public class TorControlConnection implements TorControlCommands
     * by "\<\<"
     */
     public void setDebugging(java.io.PrintWriter w) {
-        if (w instanceof java.io.PrintWriter)
-            debugOutput = (java.io.PrintWriter) w;
-        else
-            debugOutput = new java.io.PrintWriter(w, true);
+        debugOutput = w;
     }
     
     /** Sets <b>s</b> as the PrintStream for debugging output, 
@@ -310,12 +307,12 @@ public class TorControlConnection implements TorControlCommands
     /** helper: implement the main background loop. */
     protected void react() throws IOException {
         while (true) {
-            ArrayList lst = readReply();
+            ArrayList<ReplyLine> lst = readReply();
             if (lst.isEmpty()) {
                 // connection has been closed remotely! end the loop!
                 return;
             }
-            if (((ReplyLine)lst.get(0)).status.startsWith("6"))
+            if ((lst.get(0)).status.startsWith("6"))
                 handleEvent(lst);
             else {
                 Waiter w;
@@ -330,16 +327,16 @@ public class TorControlConnection implements TorControlCommands
     /** Change the value of the configuration option 'key' to 'val'.
      */
     public void setConf(String key, String value) throws IOException {
-        List lst = new ArrayList();
+        List<String> lst = new ArrayList<String>();
         lst.add(key+" "+value);
         setConf(lst);
     }
 
     /** Change the values of the configuration options stored in kvMap. */
-    public void setConf(Map kvMap) throws IOException {
-        List lst = new ArrayList();
-        for (Iterator it = kvMap.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry ent = (Map.Entry) it.next();
+    public void setConf(Map<String, String> kvMap) throws IOException {
+        List<String> lst = new ArrayList<String>();
+        for (Iterator<Map.Entry<String,String>> it = kvMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String,String> ent = it.next();
             lst.add(ent.getKey()+" "+ent.getValue()+"\n");
         }
         setConf(lst);
@@ -365,12 +362,12 @@ public class TorControlConnection implements TorControlCommands
      * To remove all settings for a given option entirely (and go back to its
      * default value), include a String in <b>kvList</b> containing the key and no value.
      */
-    public void setConf(Collection kvList) throws IOException {
+    public void setConf(Collection<String> kvList) throws IOException {
         if (kvList.size() == 0)
             return;
         StringBuffer b = new StringBuffer("SETCONF");
-        for (Iterator it = kvList.iterator(); it.hasNext(); ) {
-            String kv = (String) it.next();
+        for (Iterator<String> it = kvList.iterator(); it.hasNext(); ) {
+            String kv = it.next();
             int i = kv.indexOf(' ');
             if (i == -1)
                 b.append(" ").append(kv);
@@ -384,12 +381,12 @@ public class TorControlConnection implements TorControlCommands
     /** Try to reset the values listed in the collection 'keys' to their
      * default values.
      **/
-    public void resetConf(Collection keys) throws IOException {
+    public void resetConf(Collection<String> keys) throws IOException {
         if (keys.size() == 0)
             return;
         StringBuffer b = new StringBuffer("RESETCONF");
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            String key = (String) it.next();
+        for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
+            String key = it.next();
             b.append(" ").append(key);
         }
         b.append("\r\n");
@@ -397,8 +394,8 @@ public class TorControlConnection implements TorControlCommands
     }
 
     /** Return the value of the configuration option 'key' */
-    public List getConf(String key) throws IOException {
-        List lst = new ArrayList();
+    public List<ConfigEntry> getConf(String key) throws IOException {
+        List<String> lst = new ArrayList<String>();
         lst.add(key);
         return getConf(lst);
     }
@@ -415,16 +412,16 @@ public class TorControlConnection implements TorControlCommands
      * virtual keyword to get all HiddenServiceDir, HiddenServicePort,
      * HiddenServiceNodes, and HiddenServiceExcludeNodes option settings.
      */
-    public List getConf(Collection keys) throws IOException {
+    public List<ConfigEntry> getConf(Collection<String> keys) throws IOException {
         StringBuffer sb = new StringBuffer("GETCONF");
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            String key = (String) it.next();
+        for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
+            String key = it.next();
             sb.append(" ").append(key);
         }
         sb.append("\r\n");
-        ArrayList lst = sendAndWaitForResponse(sb.toString(), null);
-        ArrayList result = new ArrayList();
-        for (Iterator it = lst.iterator(); it.hasNext(); ) {
+        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        ArrayList<ConfigEntry> result = new ArrayList<ConfigEntry>();
+        for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
             if (idx >= 0)
@@ -444,16 +441,10 @@ public class TorControlConnection implements TorControlCommands
      * Any events not listed in the <b>events</b> are turned off; thus, calling
      * setEvents with an empty <b>events</b> argument turns off all event reporting.
      */
-    public void setEvents(List events) throws IOException {
+    public void setEvents(List<String> events) throws IOException {
         StringBuffer sb = new StringBuffer("SETEVENTS");
-        for (Iterator it = events.iterator(); it.hasNext(); ) {
-            Object event = it.next();
-            if (event instanceof String) {
-                sb.append(" ").append((String)event);
-            } else {
-                int i = ((Number) event).intValue();
-                sb.append(" ").append(EVENT_NAMES[i]);
-            }
+        for (Iterator<String> it = events.iterator(); it.hasNext(); ) {
+            sb.append(" ").append(it.next());
         }
         sb.append("\r\n");
         sendAndWaitForResponse(sb.toString(), null);
@@ -547,18 +538,18 @@ public class TorControlConnection implements TorControlCommands
      * a certain time, then it must explicitly un-map the address when that
      * time has elapsed.
      */
-    public Map mapAddresses(Collection kvLines) throws IOException {
+    public Map<String,String> mapAddresses(Collection<String> kvLines) throws IOException {
         StringBuffer sb = new StringBuffer("MAPADDRESS");
-        for (Iterator it = kvLines.iterator(); it.hasNext(); ) {
-            String kv = (String) it.next();
+        for (Iterator<String> it = kvLines.iterator(); it.hasNext(); ) {
+            String kv = it.next();
             int i = kv.indexOf(' ');
             sb.append(" ").append(kv.substring(0,i)).append("=")
                 .append(quote(kv.substring(i+1)));
         }
         sb.append("\r\n");
-        ArrayList lst = sendAndWaitForResponse(sb.toString(), null);
-        Map result = new HashMap();
-        for (Iterator it = lst.iterator(); it.hasNext(); ) {
+        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        Map<String,String> result = new HashMap<String,String>();
+        for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
             result.put(kv.substring(0, idx),
@@ -567,20 +558,20 @@ public class TorControlConnection implements TorControlCommands
         return result;
     }
 
-    public Map mapAddresses(Map addresses) throws IOException {
-        List kvList = new ArrayList();
-        for (Iterator it = addresses.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry e = (Map.Entry) it.next();
+    public Map<String,String> mapAddresses(Map<String,String> addresses) throws IOException {
+        List<String> kvList = new ArrayList<String>();
+        for (Iterator<Map.Entry<String, String>> it = addresses.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String,String> e = it.next();
             kvList.add(e.getKey()+" "+e.getValue());
         }
         return mapAddresses(kvList);
     }
 
     public String mapAddress(String fromAddr, String toAddr) throws IOException {
-        List lst = new ArrayList();
+        List<String> lst = new ArrayList<String>();
         lst.add(fromAddr+" "+toAddr+"\n");
-        Map m = mapAddresses(lst);
-        return (String) m.get(fromAddr);
+        Map<String,String> m = mapAddresses(lst);
+        return m.get(fromAddr);
     }
 
     /** Queries the Tor server for keyed values that are not stored in the torrc
@@ -613,21 +604,21 @@ public class TorControlConnection implements TorControlCommands
      * form: "ServerID ORStatus"</li>
      * </ul>
      */
-    public Map getInfo(Collection keys) throws IOException {
+    public Map<String,String> getInfo(Collection<String> keys) throws IOException {
         StringBuffer sb = new StringBuffer("GETINFO");
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            sb.append(" ").append((String)it.next());
+        for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
+            sb.append(" ").append(it.next());
         }
         sb.append("\r\n");
-        ArrayList lst = sendAndWaitForResponse(sb.toString(), null);
-        Map m = new HashMap();
-        for (Iterator it = lst.iterator(); it.hasNext(); ) {
-            ReplyLine line = (ReplyLine) it.next();
+        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        Map<String,String> m = new HashMap<String,String>();
+        for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
+            ReplyLine line = it.next();
             int idx = line.msg.indexOf('=');
             if (idx<0)
                 break;
             String k = line.msg.substring(0,idx);
-            Object v;
+            String v;
             if (line.rest != null) {
                 v = line.rest;
             } else {
@@ -642,10 +633,10 @@ public class TorControlConnection implements TorControlCommands
     
     /** Return the value of the information field 'key' */
     public String getInfo(String key) throws IOException {
-        List lst = new ArrayList();
+        List<String> lst = new ArrayList<String>();
         lst.add(key);
-        Map m = getInfo(lst);
-        return (String) m.get(key);
+        Map<String,String> m = getInfo(lst);
+        return  m.get(key);
     }
 
     /** An extendCircuit request takes one of two forms: either the <b>circID</b> is zero, in
@@ -657,9 +648,9 @@ public class TorControlConnection implements TorControlCommands
      * If successful, returns the Circuit ID of the (maybe newly created) circuit.
      */
     public String extendCircuit(String circID, String path) throws IOException {
-        ArrayList lst = sendAndWaitForResponse(
+        ArrayList<ReplyLine> lst = sendAndWaitForResponse(
                           "EXTENDCIRCUIT "+circID+" "+path+"\r\n", null);
-        return ((ReplyLine)lst.get(0)).msg;
+        return (lst.get(0)).msg;
     }
     
     /** Informs the Tor server that the stream specified by <b>streamID</b> should be
@@ -693,8 +684,8 @@ public class TorControlConnection implements TorControlCommands
     // More documentation here on format of desc?
     // No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
     public String postDescriptor(String desc) throws IOException {
-        ArrayList lst = sendAndWaitForResponse("+POSTDESCRIPTOR\r\n", desc);
-        return ((ReplyLine)lst.get(0)).msg;
+        ArrayList<ReplyLine> lst = sendAndWaitForResponse("+POSTDESCRIPTOR\r\n", desc);
+        return (lst.get(0)).msg;
     }
 
     /** Tells Tor to change the exit address of the stream identified by <b>streamID</b>

@@ -65,7 +65,7 @@ final class Bytes {
      * Read bytes from 'ba' starting at 'pos', dividing them into strings
      * along the character in 'split' and writing them into 'lst'
      */
-    public static void splitStr(List lst, byte[] ba, int pos, byte split) {
+    public static void splitStr(List<String> lst, byte[] ba, int pos, byte split) {
         while (pos < ba.length && ba[pos] != 0) {
             int len;
             for (len=0; pos+len < ba.length; ++len) {
@@ -84,7 +84,7 @@ final class Bytes {
      * Read bytes from 'ba' starting at 'pos', dividing them into strings
      * along the character in 'split' and writing them into 'lst'
      */
-    public static List splitStr(List lst, String str) {
+    public static List<String> splitStr(List<String> lst, String str) {
         // split string on spaces, include trailing/leading
         String[] tokenArray = str.split(" ", -1);
         if (lst == null) {

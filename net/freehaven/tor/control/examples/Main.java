@@ -69,7 +69,7 @@ public class Main implements TorControlCommands {
     public static void setConfig(String[] args) throws IOException {
         // Usage: "set-config [-save] key value key value key value"
         TorControlConnection conn = getConnection(args);
-        ArrayList lst = new ArrayList();
+        ArrayList<String> lst = new ArrayList<String>();
         int i = 1;
         boolean save = false;
         if (args[i].equals("-save")) {
@@ -88,9 +88,9 @@ public class Main implements TorControlCommands {
     public static void getConfig(String[] args) throws IOException {
         // Usage: get-config key key key
         TorControlConnection conn = getConnection(args);
-        List lst = conn.getConf(Arrays.asList(args).subList(1,args.length));
-        for (Iterator i = lst.iterator(); i.hasNext(); ) {
-            ConfigEntry e = (ConfigEntry) i.next();
+        List<ConfigEntry> lst = conn.getConf(Arrays.asList(args).subList(1,args.length));
+        for (Iterator<ConfigEntry> i = lst.iterator(); i.hasNext(); ) {
+            ConfigEntry e = i.next();
             System.out.println("KEY: "+e.key);
             System.out.println("VAL: "+e.value);
         }
@@ -98,9 +98,9 @@ public class Main implements TorControlCommands {
 
     public static void getInfo(String[] args) throws IOException {
         TorControlConnection conn = getConnection(args);
-        Map m = conn.getInfo(Arrays.asList(args).subList(1,args.length));
-        for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
+        Map<String,String> m = conn.getInfo(Arrays.asList(args).subList(1,args.length));
+        for (Iterator<Map.Entry<String, String>> i = m.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry<String,String> e = i.next();
             System.out.println("KEY: "+e.getKey());
             System.out.println("VAL: "+e.getValue());
         }
@@ -109,7 +109,7 @@ public class Main implements TorControlCommands {
     public static void listenForEvents(String[] args) throws IOException {
         // Usage: listen [circ|stream|orconn|bw|newdesc|info|notice|warn|error]*
         TorControlConnection conn = getConnection(args, false);
-        ArrayList lst = new ArrayList();
+        ArrayList<String> lst = new ArrayList<String>();
         for (int i = 1; i < args.length; ++i) {
             lst.add(args[i]);
         }

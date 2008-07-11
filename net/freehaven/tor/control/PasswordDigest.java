@@ -35,7 +35,7 @@ public class PasswordDigest {
      * iterations as in RFC2440.
      */
     public PasswordDigest(byte[] secret, byte[] specifier) {
-        this.secret = secret;
+        this.secret = secret.clone();
         if (specifier == null) {
             specifier = new byte[9];
             SecureRandom rng = new SecureRandom();
@@ -48,7 +48,7 @@ public class PasswordDigest {
     /** Return the secret used to generate this password hash.
      */
     public byte[] getSecret() {
-        return secret;
+        return secret.clone();
     }
 
     /** Return the hashed password in the format used by Tor. */

@@ -28,9 +28,9 @@ public class DebuggingEventHandler implements EventHandler {
         out.println("Bandwidth usage: "+read+" bytes read; "+
                     written+" bytes written.");
     }
-    public void newDescriptors(java.util.List orList) {
+    public void newDescriptors(java.util.List<String> orList) {
         out.println("New descriptors for routers:");
-        for (Iterator i = orList.iterator(); i.hasNext(); )
+        for (Iterator<String> i = orList.iterator(); i.hasNext(); )
             out.println("   "+i.next());
     }
     public void message(String type, String msg) {
