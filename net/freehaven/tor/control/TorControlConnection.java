@@ -174,7 +174,7 @@ public class TorControlConnection implements TorControlCommands
         return reply;
     }
 
-    protected synchronized ArrayList<ReplyLine> sendAndWaitForResponse(String s,String rest)
+    protected synchronized List<ReplyLine> sendAndWaitForResponse(String s,String rest)
         throws IOException {
         checkThread();
         Waiter w = new Waiter();
@@ -187,7 +187,7 @@ public class TorControlConnection implements TorControlCommands
                 writeEscaped(rest);
             waiters.addLast(w);
         }
-        ArrayList<ReplyLine> lst = w.getResponse();
+        List<ReplyLine> lst = w.getResponse();
         for (Iterator<ReplyLine> i = lst.iterator(); i.hasNext(); ) {
             ReplyLine c = i.next();
             if (! c.status.startsWith("2"))
@@ -419,8 +419,8 @@ public class TorControlConnection implements TorControlCommands
             sb.append(" ").append(key);
         }
         sb.append("\r\n");
-        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
-        ArrayList<ConfigEntry> result = new ArrayList<ConfigEntry>();
+        List<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        List<ConfigEntry> result = new ArrayList<ConfigEntry>();
         for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
             int idx = kv.indexOf('=');
@@ -547,7 +547,7 @@ public class TorControlConnection implements TorControlCommands
                 .append(quote(kv.substring(i+1)));
         }
         sb.append("\r\n");
-        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        List<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
         Map<String,String> result = new HashMap<String,String>();
         for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
             String kv = ((ReplyLine) it.next()).msg;
@@ -610,7 +610,7 @@ public class TorControlConnection implements TorControlCommands
             sb.append(" ").append(it.next());
         }
         sb.append("\r\n");
-        ArrayList<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
+        List<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
         Map<String,String> m = new HashMap<String,String>();
         for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
             ReplyLine line = it.next();
@@ -648,7 +648,7 @@ public class TorControlConnection implements TorControlCommands
      * If successful, returns the Circuit ID of the (maybe newly created) circuit.
      */
     public String extendCircuit(String circID, String path) throws IOException {
-        ArrayList<ReplyLine> lst = sendAndWaitForResponse(
+        List<ReplyLine> lst = sendAndWaitForResponse(
                           "EXTENDCIRCUIT "+circID+" "+path+"\r\n", null);
         return (lst.get(0)).msg;
     }
@@ -684,7 +684,7 @@ public class TorControlConnection implements TorControlCommands
     // More documentation here on format of desc?
     // No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
     public String postDescriptor(String desc) throws IOException {
-        ArrayList<ReplyLine> lst = sendAndWaitForResponse("+POSTDESCRIPTOR\r\n", desc);
+        List<ReplyLine> lst = sendAndWaitForResponse("+POSTDESCRIPTOR\r\n", desc);
         return (lst.get(0)).msg;
     }
 
