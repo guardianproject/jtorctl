@@ -40,7 +40,7 @@ final class Bytes {
     }
 
     public static String getU32S(byte[] ba, int pos) {
-        return String.valueOf( ((long)getU32(ba,pos))&0xffffffffL );
+        return String.valueOf( (getU32(ba,pos))&0xffffffffL );
     }
 
     /** Return the two-byte value starting at index 'pos' within 'ba' */
@@ -103,7 +103,7 @@ final class Bytes {
     public static final String hex(byte[] ba) {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < ba.length; ++i) {
-            int b = ((int)ba[i]) & 0xff;
+            int b = (ba[i]) & 0xff;
             buf.append(NYBBLES[b >> 4]);
             buf.append(NYBBLES[b&0x0f]);
         }

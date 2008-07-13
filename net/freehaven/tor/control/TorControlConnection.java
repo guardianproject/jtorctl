@@ -75,14 +75,12 @@ public class TorControlConnection implements TorControlCommands
     /** Create a new TorControlConnection to communicate with Tor over
      * an arbitrary pair of data streams.
      */
-    public TorControlConnection(java.io.InputStream i, java.io.OutputStream o)
-        throws IOException {
+    public TorControlConnection(java.io.InputStream i, java.io.OutputStream o) {
         this(new java.io.InputStreamReader(i),
              new java.io.OutputStreamWriter(o));
     }
 
-    public TorControlConnection(java.io.Reader i, java.io.Writer o)
-        throws IOException {
+    public TorControlConnection(java.io.Reader i, java.io.Writer o) {
         this.output = o;
         if (i instanceof java.io.BufferedReader)
             this.input = (java.io.BufferedReader) i;
@@ -140,11 +138,10 @@ public class TorControlConnection implements TorControlCommands
                 if (reply.isEmpty()) {
                         // nothing received so far, can exit cleanly
                         return reply;
-                } else {
-                        // received half of a reply before the connection broke down
-                        throw new TorControlSyntaxError("Connection to Tor " +
-                                        " broke down while receiving reply!");
-                }
+                } 
+                // received half of a reply before the connection broke down
+                throw new TorControlSyntaxError("Connection to Tor " +
+                     " broke down while receiving reply!");
             }
             if (debugOutput != null)
                 debugOutput.println("<< "+line);
@@ -209,22 +206,22 @@ public class TorControlConnection implements TorControlCommands
             String rest = line.msg.substring(idx+1);
             if (tp.equals("CIRC")) {
                 List<String> lst = Bytes.splitStr(null, rest);
-                handler.circuitStatus((String)lst.get(1),
-                                      (String)lst.get(0),
-                                      (String)lst.get(2));
+                handler.circuitStatus(lst.get(1),
+                                      lst.get(0),
+                                      lst.get(2));
             } else if (tp.equals("STREAM")) {
                 List<String> lst = Bytes.splitStr(null, rest);
-                handler.streamStatus((String)lst.get(1),
-                                     (String)lst.get(0),
-                                     (String)lst.get(3));
+                handler.streamStatus(lst.get(1),
+                                     lst.get(0),
+                                     lst.get(3));
                 // XXXX circID.
             } else if (tp.equals("ORCONN")) {
                 List<String> lst = Bytes.splitStr(null, rest);
-                handler.orConnStatus((String)lst.get(1), (String)lst.get(0));
+                handler.orConnStatus(lst.get(1), lst.get(0));
             } else if (tp.equals("BW")) {
                 List<String> lst = Bytes.splitStr(null, rest);
-                handler.bandwidthUsed(Integer.parseInt((String)lst.get(0)),
-                                      Integer.parseInt((String)lst.get(1)));
+                handler.bandwidthUsed(Integer.parseInt(lst.get(0)),
+                                      Integer.parseInt(lst.get(1)));
             } else if (tp.equals("NEWDESC")) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.newDescriptors(lst);
@@ -282,14 +279,14 @@ public class TorControlConnection implements TorControlCommands
 
     protected class ControlParseThread extends Thread {
     	boolean stopped = false;
-        public void run() {
+        @Override
+    	public void run() {
             try {
                 react();
             } catch (SocketException ex) {
             	if (stopped) // we expected this exception
                     return;
-                else
-                    throw new RuntimeException(ex);
+                throw new RuntimeException(ex);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -317,7 +314,7 @@ public class TorControlConnection implements TorControlCommands
             else {
                 Waiter w;
                 synchronized (waiters) {
-                    w = (Waiter) waiters.removeFirst();
+                    w = waiters.removeFirst();
                 }
                 w.setResponse(lst);
             }
@@ -422,7 +419,7 @@ public class TorControlConnection implements TorControlCommands
         List<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
         List<ConfigEntry> result = new ArrayList<ConfigEntry>();
         for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
-            String kv = ((ReplyLine) it.next()).msg;
+            String kv = (it.next()).msg;
             int idx = kv.indexOf('=');
             if (idx >= 0)
                 result.add(new ConfigEntry(kv.substring(0, idx),
@@ -550,7 +547,7 @@ public class TorControlConnection implements TorControlCommands
         List<ReplyLine> lst = sendAndWaitForResponse(sb.toString(), null);
         Map<String,String> result = new HashMap<String,String>();
         for (Iterator<ReplyLine> it = lst.iterator(); it.hasNext(); ) {
-            String kv = ((ReplyLine) it.next()).msg;
+            String kv = (it.next()).msg;
             int idx = kv.indexOf('=');
             result.put(kv.substring(0, idx),
                        kv.substring(idx+1));

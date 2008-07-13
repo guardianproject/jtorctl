@@ -67,7 +67,7 @@ public class PasswordDigest {
         } catch (java.security.NoSuchAlgorithmException ex) {
             throw new RuntimeException("Can't run without sha-1.");
         }
-        int c = ((int)specifier[8])&0xff;
+        int c = (specifier[8])&0xff;
         int count = (16 + (c&15)) << ((c>>4) + EXPBIAS);
 
         byte[] tmp = new byte[8+secret.length];
