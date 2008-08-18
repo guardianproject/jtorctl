@@ -38,7 +38,8 @@ public class TorControlConnection implements TorControlCommands
                     wait();
                 }
             } catch (InterruptedException ex) {
-                return null;
+                throw new CancellationException(
+                    "Please don't interrupt library calls.");
             }
             return response;
         }
