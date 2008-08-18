@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.CancellationException;
 
 /** A connection to a running Tor process as specified in control-spec.txt. */
 public class TorControlConnection implements TorControlCommands
