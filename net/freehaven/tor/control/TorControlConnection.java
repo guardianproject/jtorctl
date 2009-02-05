@@ -1,4 +1,3 @@
-// $Id$
 // Copyright 2005 Nick Mathewson, Roger Dingledine
 // See LICENSE file for copying information
 package net.freehaven.tor.control;
