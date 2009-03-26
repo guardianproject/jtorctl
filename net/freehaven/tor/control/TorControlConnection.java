@@ -180,9 +180,9 @@ public class TorControlConnection implements TorControlCommands
             debugOutput.print(">> "+s);
         synchronized (waiters) {
             output.write(s);
-            output.flush();
             if (rest != null)
                 writeEscaped(rest);
+            output.flush();
             waiters.addLast(w);
         }
         List<ReplyLine> lst = w.getResponse();
