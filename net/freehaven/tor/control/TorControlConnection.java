@@ -209,7 +209,9 @@ public class TorControlConnection implements TorControlCommands
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.circuitStatus(lst.get(1),
                                       lst.get(0),
-                                      lst.get(2));
+                                      lst.get(1).equals("LAUNCHED")
+                                          || lst.size() < 2 ? ""
+                                          : lst.get(2));
             } else if (tp.equals("STREAM")) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.streamStatus(lst.get(1),
