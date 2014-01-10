@@ -315,11 +315,15 @@ public class TorControlConnection implements TorControlCommands
             if ((lst.get(0)).status.startsWith("6"))
                 handleEvent(lst);
             else {
-                Waiter w;
                 synchronized (waiters) {
+ 		if (!waiters.isEmpty())
+		{
+                    Waiter w;
                     w = waiters.removeFirst();
-                }
-                w.setResponse(lst);
+                    w.setResponse(lst);
+		}
+                }		
+
             }
         }
     }
