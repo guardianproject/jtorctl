@@ -2,7 +2,17 @@
 // See LICENSE file for copying information
 package net.freehaven.tor.control;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,79 +25,66 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CancellationException;
 
 /** A connection to a running Tor process as specified in control-spec.txt. */
-public class TorControlConnection implements TorControlCommands
-{
+public class TorControlConnection implements TorControlCommands {
 
-    protected EventHandler handler;
+    private final LinkedList<Waiter> waiters;
+    private final BufferedReader input;
+    private final Writer output;
 
-    protected LinkedList<Waiter> waiters;
+    private ControlParseThread thread; // Locking: this
 
-    protected ControlParseThread thread;
-
-    protected java.io.BufferedReader input;
-    
-    protected java.io.Writer output;
-    
-    protected java.io.PrintWriter debugOutput;
+    private volatile EventHandler handler;
+    private volatile PrintWriter debugOutput;
+    private volatile IOException parseThreadException;
     
     static class Waiter {
-        List<ReplyLine> response;
-        public synchronized List<ReplyLine> getResponse() {
-            try {
+    
+        List<ReplyLine> response; // Locking: this
+    
+        synchronized List<ReplyLine> getResponse() throws InterruptedException {
                 while (response == null) {
                     wait();
                 }
-            } catch (InterruptedException ex) {
-                throw new CancellationException(
-                    "Please don't interrupt library calls.");
-            }
             return response;
         }
-        public synchronized void setResponse(List<ReplyLine> response) {
+
+        synchronized void setResponse(List<ReplyLine> response) {
             this.response = response;
             notifyAll();
         }
     }
 
     static class ReplyLine {
-        public String status;
-        public String msg;
-        public String rest;
+
+        final String status;
+        final String msg;
+        final String rest;
 
         ReplyLine(String status, String msg, String rest) {
             this.status = status; this.msg = msg; this.rest = rest;
         }
     }
     
-    public static TorControlConnection getConnection(java.net.Socket sock)
-        throws IOException
-    {
-        return new TorControlConnection(sock);
-    }
-
     /** Create a new TorControlConnection to communicate with Tor over
      * a given socket.  After calling this constructor, it is typical to
      * call launchThread and authenticate. */
-    public TorControlConnection(java.net.Socket connection)
-        throws IOException {
+    public TorControlConnection(Socket connection) throws IOException {
         this(connection.getInputStream(), connection.getOutputStream());
     }
 
     /** Create a new TorControlConnection to communicate with Tor over
      * an arbitrary pair of data streams.
      */
-    public TorControlConnection(java.io.InputStream i, java.io.OutputStream o) {
-        this(new java.io.InputStreamReader(i),
-             new java.io.OutputStreamWriter(o));
+    public TorControlConnection(InputStream i, OutputStream o) {
+        this(new InputStreamReader(i), new OutputStreamWriter(o));
     }
 
-    public TorControlConnection(java.io.Reader i, java.io.Writer o) {
+    public TorControlConnection(Reader i, Writer o) {
         this.output = o;
-        if (i instanceof java.io.BufferedReader)
-            this.input = (java.io.BufferedReader) i;
+        if (i instanceof BufferedReader)
+            this.input = (BufferedReader) i;
         else
-            this.input = new java.io.BufferedReader(i);
-
+            this.input = new BufferedReader(i);
         this.waiters = new LinkedList<Waiter>();
     }
 
@@ -172,8 +169,9 @@ public class TorControlConnection implements TorControlCommands
         return reply;
     }
 
-    protected synchronized List<ReplyLine> sendAndWaitForResponse(String s,String rest)
-        throws IOException {
+    protected synchronized List<ReplyLine> sendAndWaitForResponse(String s,
+        String rest) throws IOException {
+        if(parseThreadException != null) throw parseThreadException;
         checkThread();
         Waiter w = new Waiter();
         if (debugOutput != null)
@@ -185,7 +183,12 @@ public class TorControlConnection implements TorControlCommands
             output.flush();
             waiters.addLast(w);
         }
-        List<ReplyLine> lst = w.getResponse();
+        List<ReplyLine> lst;
+        try {
+            lst = w.getResponse();
+        } catch (InterruptedException ex) {
+            throw new IOException("Interrupted");
+        }
         for (Iterator<ReplyLine> i = lst.iterator(); i.hasNext(); ) {
             ReplyLine c = i.next();
             if (! c.status.startsWith("2"))
@@ -210,7 +213,7 @@ public class TorControlConnection implements TorControlCommands
                 handler.circuitStatus(lst.get(1),
                                       lst.get(0),
                                       lst.get(1).equals("LAUNCHED")
-                                          || lst.size() < 2 ? ""
+                                          || lst.size() < 3 ? ""
                                           : lst.get(2));
             } else if (tp.equals("STREAM")) {
                 List<String> lst = Bytes.splitStr(null, rest);
@@ -246,7 +249,7 @@ public class TorControlConnection implements TorControlCommands
     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
     * by "\<\<"
     */
-    public void setDebugging(java.io.PrintWriter w) {
+    public void setDebugging(PrintWriter w) {
         debugOutput = w;
     }
     
@@ -255,8 +258,8 @@ public class TorControlConnection implements TorControlCommands
     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
     * by "\<\<"
     */
-    public void setDebugging(java.io.PrintStream s) {
-        debugOutput = new java.io.PrintWriter(s, true);
+    public void setDebugging(PrintStream s) {
+        debugOutput = new PrintWriter(s, true);
     }
 
     /** Set the EventHandler object that will be notified of any
@@ -271,7 +274,7 @@ public class TorControlConnection implements TorControlCommands
      * This is necessary to handle asynchronous events and synchronous
      * responses that arrive independantly over the same socket.
      */
-    public Thread launchThread(boolean daemon) {
+    public synchronized Thread launchThread(boolean daemon) {
     	ControlParseThread th = new ControlParseThread();
         if (daemon)
             th.setDaemon(true);
@@ -281,25 +284,18 @@ public class TorControlConnection implements TorControlCommands
     }
 
     protected class ControlParseThread extends Thread {
-    	boolean stopped = false;
+
         @Override
     	public void run() {
             try {
                 react();
-            } catch (SocketException ex) {
-            	if (stopped) // we expected this exception
-                    return;
-                throw new RuntimeException(ex);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                parseThreadException = ex;
             }
-        }
-        public void stopListening() {
-            this.stopped = true;
         }
     }
 
-    protected final void checkThread() {
+    protected synchronized void checkThread() {
         if (thread == null)
             launchThread(true);
     }
@@ -509,13 +505,9 @@ public class TorControlConnection implements TorControlCommands
         Waiter w = new Waiter();
         if (debugOutput != null)
             debugOutput.print(">> "+s);
-        if (this.thread != null) {
-            this.thread.stopListening();
-    	}
         synchronized (waiters) {
             output.write(s);
             output.flush();
-            waiters.addLast(w); // Prevent react() from finding the list empty
         }
     }
 

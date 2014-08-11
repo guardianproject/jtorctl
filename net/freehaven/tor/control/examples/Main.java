@@ -3,8 +3,10 @@
 package net.freehaven.tor.control.examples;
 
 import net.freehaven.tor.control.*;
-import java.io.PrintWriter;
+import java.io.EOFException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -34,27 +36,22 @@ public class Main implements TorControlCommands {
             } else {
                 System.err.println("Unrecognized command: "+args[0]);
             }
-        } catch (java.io.EOFException ex) {
+        } catch (EOFException ex) {
             System.out.println("Control socket closed by Tor.");
+        } catch (TorControlError ex) {
+            System.err.println("Error from Tor process: "+
+                               ex+" ["+ex.getErrorMsg()+"]");
         } catch (IOException ex) {
             System.err.println("IO exception when talking to Tor process: "+
                                ex);
             ex.printStackTrace(System.err);
-        } catch (TorControlError ex) {
-            System.err.println("Error from Tor process: "+
-                               ex+" ["+ex.getErrorMsg()+"]");
         }
     }
 
     private static TorControlConnection getConnection(String[] args,
-                                                      boolean daemon)
-        throws IOException {
-        TorControlConnection conn = TorControlConnection.getConnection(
-                                    new java.net.Socket("127.0.0.1", 9100));
-        //if (conn instanceof TorControlConnection1) {
-        //    System.err.println("Debugging");
-        //    ((TorControlConnection1)conn).setDebugging(System.err);
-        //}
+        boolean daemon) throws IOException {
+        Socket s = new Socket("127.0.0.1", 9100);
+        TorControlConnection conn = new TorControlConnection(s);
         conn.launchThread(daemon);
         conn.authenticate(new byte[0]);
         return conn;
@@ -132,15 +129,15 @@ public class Main implements TorControlCommands {
     public static void authDemo(String[] args) throws IOException {
 
         PasswordDigest pwd = PasswordDigest.generateDigest();
-        java.net.Socket s = new java.net.Socket("127.0.0.1", 9100);
-        TorControlConnection conn = TorControlConnection.getConnection(s);
+        Socket s = new Socket("127.0.0.1", 9100);
+        TorControlConnection conn = new TorControlConnection(s);
         conn.launchThread(true);
         conn.authenticate(new byte[0]);
 
         conn.setConf("HashedControlPassword", pwd.getHashedPassword());
 
-        conn = TorControlConnection.getConnection(
-                                    new java.net.Socket("127.0.0.1", 9100));
+        s = new Socket("127.0.0.1", 9100);
+        conn = new TorControlConnection(s);
         conn.launchThread(true);
         conn.authenticate(pwd.getSecret());
     }

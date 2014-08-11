@@ -8,7 +8,7 @@ import net.freehaven.tor.control.EventHandler;
 
 public class DebuggingEventHandler implements EventHandler {
 
-    protected PrintWriter out;
+    private final PrintWriter out;
 
     public DebuggingEventHandler(PrintWriter p) {
         out = p;

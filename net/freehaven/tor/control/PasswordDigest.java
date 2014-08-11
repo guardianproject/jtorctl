@@ -2,8 +2,9 @@
 // See LICENSE file for copying information
 package net.freehaven.tor.control;
 
-import java.security.SecureRandom;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * A hashed digest of a secret password (used to set control connection
@@ -13,8 +14,8 @@ import java.security.MessageDigest;
  */
 public class PasswordDigest {
 
-    byte[] secret;
-    String hashedKey;
+    private final byte[] secret;
+    private final String hashedKey;
 
     /** Return a new password digest with a random secret and salt. */
     public static PasswordDigest generateDigest() {
@@ -63,7 +64,7 @@ public class PasswordDigest {
         MessageDigest d;
         try {
             d = MessageDigest.getInstance("SHA-1");
-        } catch (java.security.NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException("Can't run without sha-1.");
         }
         int c = (specifier[8])&0xff;
