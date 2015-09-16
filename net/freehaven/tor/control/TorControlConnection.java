@@ -728,5 +728,19 @@ public class TorControlConnection implements TorControlCommands {
         sendAndWaitForResponse("CLOSECIRCUIT "+circID+
                                (ifUnused?" IFUNUSED":"")+"\r\n", null);
     }
+
+    /** Tells Tor to exit when this control connection is closed. This command
+     * was added in Tor 0.2.2.28-beta.
+     */
+    public void takeOwnership() throws IOException {
+        sendAndWaitForResponse("TAKEOWNERSHIP\r\n", null);
+    }
+
+    /** Tells Tor to forget any cached client state relating to the hidden
+     * service with the given hostname (excluding the .onion extension).
+     */
+    public void forgetHiddenService(String hostname) throws IOException {
+        sendAndWaitForResponse("FORGETHS " + hostname + "\r\n", null);
+    }
 }
 

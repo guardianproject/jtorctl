@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.freehaven.tor.control</groupId>
+  <artifactId>jtorctl</artifactId>
+  <version>0.2</version>
+  <name></name>
+  <url>https://github.com/guardianproject/jtorctl</url>
+  <description>A Java library for controlling a Tor instance via its control port.</description>
+  <licenses>
+   <license>
+     <name>BSD-3-clause</name>
+     <url>https://github.com/guardianproject/jtorctl/blob/master/LICENSE</url>
+   </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>freehaven</id>
+      <name>Free Haven Project</name>
+      <email>freehaven@freehaven.net</email>
+    </developer>
+    <developer>
+      <id>guardianproject</id>
+      <name>Guardian Project</name>
+      <email>support@guardianproject.info</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:https://github.com/guardianproject/jtorctl.git</connection>
+    <developerConnection>scm:git@github.com:guardianproject/jtorctl.git</developerConnection>
+    <url>scm:https://github.com/guardianproject/jtorctl</url>
+  </scm>
+</project>
