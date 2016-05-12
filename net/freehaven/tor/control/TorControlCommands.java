@@ -144,5 +144,8 @@ public interface TorControlCommands {
         "No such OR",
     };
 
+    public static final String HS_ADDRESS = "onionAddress";
+    public static final String HS_PRIVKEY = "onionPrivKey";
+
 }
 

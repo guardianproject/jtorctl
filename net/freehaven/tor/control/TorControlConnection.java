@@ -736,6 +736,106 @@ public class TorControlConnection implements TorControlCommands {
         sendAndWaitForResponse("TAKEOWNERSHIP\r\n", null);
     }
 
+    /**
+     * Tells Tor to generate and set up a new onion service using the best
+     * supported algorithm.
+     * <p/>
+     * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public Map<String,String> addOnion(Map<Integer,String> portLines)
+                                       throws IOException {
+        return addOnion("NEW:BEST", portLines, null);
+    }
+
+    /**
+     * Tells Tor to generate and set up a new onion service using the best
+     * supported algorithm.
+     * <p/>
+     * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public Map<String,String> addOnion(Map<Integer,String> portLines,
+                                       boolean ephemeral, boolean detach)
+                                       throws IOException {
+        return addOnion("NEW:BEST", portLines, ephemeral, detach);
+    }
+
+    /**
+     * Tells Tor to set up an onion service using the provided private key.
+     * <p/>
+     * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public Map<String,String> addOnion(String privKey,
+                                       Map<Integer,String> portLines)
+                                       throws IOException {
+        return addOnion(privKey, portLines, null);
+    }
+
+    /**
+     * Tells Tor to set up an onion service using the provided private key.
+     * <p/>
+     * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public Map<String,String> addOnion(String privKey,
+                                       Map<Integer,String> portLines,
+                                       boolean ephemeral, boolean detach)
+                                       throws IOException {
+        List<String> flags = new ArrayList<String>();
+        if (ephemeral)
+            flags.add("DiscardPK");
+        if (detach)
+            flags.add("Detach");
+        return addOnion(privKey, portLines, flags);
+    }
+
+    /**
+     * Tells Tor to set up an onion service.
+     * <p/>
+     * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public Map<String,String> addOnion(String privKey,
+                                       Map<Integer,String> portLines,
+                                       List<String> flags)
+                                       throws IOException {
+        if (privKey.indexOf(':') < 0)
+            throw new IllegalArgumentException("Invalid privKey");
+        if (portLines == null || portLines.size() < 1)
+            throw new IllegalArgumentException("Must provide at least one port line");
+        StringBuilder b = new StringBuilder();
+        b.append("ADD_ONION ").append(privKey);
+        if (flags != null && flags.size() > 0) {
+            b.append(" Flags=");
+            String separator = "";
+            for (String flag : flags) {
+                b.append(separator).append(flag);
+                separator = ",";
+            }
+        }
+        for (Map.Entry<Integer,String> portLine : portLines.entrySet()) {
+            int virtPort = portLine.getKey();
+            String target = portLine.getValue();
+            b.append(" Port=").append(virtPort);
+            if (target != null && target.length() > 0)
+                b.append(",").append(target);
+        }
+        b.append("\r\n");
+        List<ReplyLine> lst = sendAndWaitForResponse(b.toString(), null);
+        Map<String,String> ret = new HashMap<String,String>();
+        ret.put(HS_ADDRESS, (lst.get(0)).msg.split("=", 2)[1]);
+        if (lst.size() > 2)
+            ret.put(HS_PRIVKEY, (lst.get(1)).msg.split("=", 2)[1]);
+        return ret;
+    }
+
+    /**
+     * Tells Tor to take down an onion service previously set up with
+     * addOnion(). The hostname excludes the .onion extension.
+     * <p/>
+     * DEL_ONION was added in Tor 0.2.7.1-alpha.
+     */
+    public void delOnion(String hostname) throws IOException {
+        sendAndWaitForResponse("DEL_ONION " + hostname + "\r\n", null);
+    }
+
     /** Tells Tor to forget any cached client state relating to the hidden
      * service with the given hostname (excluding the .onion extension).
      */
