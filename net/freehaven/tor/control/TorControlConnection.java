@@ -45,7 +45,7 @@ public class TorControlConnection implements TorControlCommands {
         synchronized List<ReplyLine> getResponse() throws InterruptedException {
                 while (response == null) {
                     wait();
-                    if(interrupted){
+                    if (interrupted) {
                         throw new InterruptedException();
                     }
                 }
@@ -57,7 +57,7 @@ public class TorControlConnection implements TorControlCommands {
             notifyAll();
         }
 
-        synchronized void interrupt(){
+        synchronized void interrupt() {
             interrupted = true;
             notifyAll();
         }
@@ -180,7 +180,7 @@ public class TorControlConnection implements TorControlCommands {
 
     protected synchronized List<ReplyLine> sendAndWaitForResponse(String s,
         String rest) throws IOException {
-        if(parseThreadException != null) throw parseThreadException;
+        if (parseThreadException != null) throw parseThreadException;
         checkThread();
         Waiter w = new Waiter();
         if (debugOutput != null)
@@ -322,9 +322,7 @@ public class TorControlConnection implements TorControlCommands {
                         }
                     }
                 }
-                parseThreadException = new IOException("Tor is no longer running");
-                // connection has been closed remotely! end the loop!
-                return;
+                throw new IOException("Tor is no longer running");
             }
             if ((lst.get(0)).status.startsWith("6"))
                 handleEvent(lst);
