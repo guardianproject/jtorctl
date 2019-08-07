@@ -858,7 +858,7 @@ public class TorControlConnection implements TorControlCommands {
      * service with the given hostname (excluding the .onion extension).
      */
     public void forgetHiddenService(String hostname) throws IOException {
-        sendAndWaitForResponse("FORGETHS " + hostname + "\r\n", null);
+        sendAndWaitForResponse("HSFORGET " + hostname + "\r\n", null);
     }
 }
 
