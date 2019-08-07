@@ -40,16 +40,25 @@ public class TorControlConnection implements TorControlCommands {
     static class Waiter {
     
         List<ReplyLine> response; // Locking: this
+        boolean interrupted;
     
         synchronized List<ReplyLine> getResponse() throws InterruptedException {
                 while (response == null) {
                     wait();
+                    if(interrupted){
+                        throw new InterruptedException();
+                    }
                 }
             return response;
         }
 
         synchronized void setResponse(List<ReplyLine> response) {
             this.response = response;
+            notifyAll();
+        }
+
+        synchronized void interrupt(){
+            interrupted = true;
             notifyAll();
         }
     }
@@ -305,6 +314,15 @@ public class TorControlConnection implements TorControlCommands {
         while (true) {
             ArrayList<ReplyLine> lst = readReply();
             if (lst.isEmpty()) {
+                // interrupted queued waiters, there won't be any response.
+                synchronized (waiters) {
+                    if (!waiters.isEmpty()) {
+                        for (Waiter w : waiters) {
+                            w.interrupt();
+                        }
+                    }
+                }
+                parseThreadException = new IOException("Tor is no longer running");
                 // connection has been closed remotely! end the loop!
                 return;
             }
