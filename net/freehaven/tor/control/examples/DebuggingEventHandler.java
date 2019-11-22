@@ -2,9 +2,10 @@
 // See LICENSE file for copying information
 package net.freehaven.tor.control.examples;
 
+import net.freehaven.tor.control.EventHandler;
+
 import java.io.PrintWriter;
 import java.util.Iterator;
-import net.freehaven.tor.control.EventHandler;
 
 public class DebuggingEventHandler implements EventHandler {
 
