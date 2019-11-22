@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.briarproject</groupId>
+  <groupId>org.torproject</groupId>
   <artifactId>jtorctl</artifactId>
   <version>0.3</version>
-  <url>https://github.com/akwizgran/jtorctl</url>
+  <url>https://github.com/torproject/jtorctl</url>
   <description>A Java library for controlling a Tor instance via its control port.</description>
   <licenses>
    <license>
      <name>BSD-3-clause</name>
-     <url>https://github.com/akwizgran/jtorctl/blob/master/LICENSE</url>
+     <url>https://github.com/torproject/jtorctl/blob/master/LICENSE</url>
    </license>
   </licenses>
   <developers>
+    <developer>
+      <id>torproject</id>
+      <name>Tor Project</name>
+      <email>torbrowser@torproject.org</email>
+    </developer>
     <developer>
       <id>freehaven</id>
       <name>Free Haven Project</name>
@@ -30,8 +35,8 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:https://github.com/akwizgran/jtorctl.git</connection>
-    <developerConnection>scm:git@github.com:akwizgran/jtorctl.git</developerConnection>
-    <url>scm:https://github.com/akwizgran/jtorctl</url>
+    <connection>scm:https://github.com/torproject/jtorctl.git</connection>
+    <developerConnection>scm:git@github.com:torproject/jtorctl.git</developerConnection>
+    <url>scm:https://github.com/torproject/jtorctl</url>
   </scm>
 </project>
