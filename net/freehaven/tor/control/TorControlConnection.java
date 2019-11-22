@@ -22,7 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-/** A connection to a running Tor process as specified in control-spec.txt. */
+/**
+ * A connection to a running Tor process as specified in control-spec.txt.
+ *
+ * @see <a href="https://gitweb.torproject.org/torspec.git/tree/control-spec.txt#n257">torspec.git/control-spec.txt 3. Commands</a>
+ */
 public class TorControlConnection implements TorControlCommands {
 
     private final LinkedList<Waiter> waiters;
@@ -379,7 +383,7 @@ public class TorControlConnection implements TorControlCommands {
     public void setConf(Collection<String> kvList) throws IOException {
         if (kvList.size() == 0)
             return;
-        StringBuffer b = new StringBuffer("SETCONF");
+        StringBuffer b = new StringBuffer(SETCONF);
         for (Iterator<String> it = kvList.iterator(); it.hasNext(); ) {
             String kv = it.next();
             int i = kv.indexOf(' ');
@@ -398,7 +402,7 @@ public class TorControlConnection implements TorControlCommands {
     public void resetConf(Collection<String> keys) throws IOException {
         if (keys.size() == 0)
             return;
-        StringBuffer b = new StringBuffer("RESETCONF");
+        StringBuffer b = new StringBuffer(RESETCONF);
         for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
             String key = it.next();
             b.append(" ").append(key);
@@ -427,7 +431,7 @@ public class TorControlConnection implements TorControlCommands {
      * HiddenServiceNodes, and HiddenServiceExcludeNodes option settings.
      */
     public List<ConfigEntry> getConf(Collection<String> keys) throws IOException {
-        StringBuffer sb = new StringBuffer("GETCONF");
+        StringBuffer sb = new StringBuffer(GETCONF);
         for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
             String key = it.next();
             sb.append(" ").append(key);
@@ -456,7 +460,7 @@ public class TorControlConnection implements TorControlCommands {
      * setEvents with an empty <b>events</b> argument turns off all event reporting.
      */
     public void setEvents(List<String> events) throws IOException {
-        StringBuffer sb = new StringBuffer("SETEVENTS");
+        StringBuffer sb = new StringBuffer(SETEVENTS);
         for (Iterator<String> it = events.iterator(); it.hasNext(); ) {
             sb.append(" ").append(it.next());
         }
@@ -486,14 +490,14 @@ public class TorControlConnection implements TorControlCommands {
      * secret that was used to generate the password.
      */
     public void authenticate(byte[] auth) throws IOException {
-        String cmd = "AUTHENTICATE " + Bytes.hex(auth) + "\r\n";
+        String cmd = AUTHENTICATE + " " + Bytes.hex(auth) + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
 
     /** Instructs the server to write out its configuration options into its torrc.
      */
     public void saveConf() throws IOException {
-        sendAndWaitForResponse("SAVECONF\r\n", null);
+        sendAndWaitForResponse(SAVECONF + "\r\n", null);
     }
 
     /** Sends a signal from the controller to the Tor server.
@@ -508,14 +512,14 @@ public class TorControlConnection implements TorControlCommands {
      * </ul>
      */
     public void signal(String signal) throws IOException {
-        String cmd = "SIGNAL " + signal + "\r\n";
+        String cmd = SIGNAL + " " + signal + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
 
     /** Send a signal to the Tor process to shut it down or halt it.
      * Does not wait for a response. */
     public void shutdownTor(String signal) throws IOException {
-        String s = "SIGNAL " + signal + "\r\n";
+        String s = SIGNAL + " " + signal + "\r\n";
         Waiter w = new Waiter();
         if (debugOutput != null)
             debugOutput.print(">> "+s);
@@ -549,7 +553,7 @@ public class TorControlConnection implements TorControlCommands {
      * time has elapsed.
      */
     public Map<String,String> mapAddresses(Collection<String> kvLines) throws IOException {
-        StringBuffer sb = new StringBuffer("MAPADDRESS");
+        StringBuffer sb = new StringBuffer(MAPADDRESS);
         for (Iterator<String> it = kvLines.iterator(); it.hasNext(); ) {
             String kv = it.next();
             int i = kv.indexOf(' ');
@@ -615,7 +619,7 @@ public class TorControlConnection implements TorControlCommands {
      * </ul>
      */
     public Map<String,String> getInfo(Collection<String> keys) throws IOException {
-        StringBuffer sb = new StringBuffer("GETINFO");
+        StringBuffer sb = new StringBuffer(GETINFO);
         for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
             sb.append(" ").append(it.next());
         }
@@ -659,7 +663,7 @@ public class TorControlConnection implements TorControlCommands {
      */
     public String extendCircuit(String circID, String path) throws IOException {
         List<ReplyLine> lst = sendAndWaitForResponse(
-                          "EXTENDCIRCUIT "+circID+" "+path+"\r\n", null);
+                EXTENDCIRCUIT + " " + circID + " " + path + "\r\n", null);
         return (lst.get(0)).msg;
     }
     
@@ -671,10 +675,10 @@ public class TorControlConnection implements TorControlCommands {
      * Streams can only be attached to completed circuits (that is, circuits that
      * have sent a circuit status "BUILT" event or are listed as built in a
      * getInfo circuit-status request).
-     * 
+     *
      * If <b>circID</b> is 0, responsibility for attaching the given stream is
      * returned to Tor.
-     * 
+     *
      * By default, Tor automatically attaches streams to
      * circuits itself, unless the configuration variable
      * "__LeaveStreamsUnattached" is set to "1".  Attempting to attach streams
@@ -683,31 +687,30 @@ public class TorControlConnection implements TorControlCommands {
      */
     public void attachStream(String streamID, String circID)
         throws IOException {
-        sendAndWaitForResponse("ATTACHSTREAM "+streamID+" "+circID+"\r\n", null);
+        sendAndWaitForResponse(ATTACHSTREAM + " " + streamID + " " + circID + "\r\n", null);
     }
 
     /** Tells Tor about the server descriptor in <b>desc</b>.
-     * 
+     *
      * The descriptor, when parsed, must contain a number of well-specified
      * fields, including fields for its nickname and identity.
      */
     // More documentation here on format of desc?
     // No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
     public String postDescriptor(String desc) throws IOException {
-        List<ReplyLine> lst = sendAndWaitForResponse("+POSTDESCRIPTOR\r\n", desc);
+        List<ReplyLine> lst = sendAndWaitForResponse(POSTDESCRIPTOR + "\r\n", desc);
         return (lst.get(0)).msg;
     }
 
     /** Tells Tor to change the exit address of the stream identified by <b>streamID</b>
      * to <b>address</b>. No remapping is performed on the new provided address.
-     * 
+     *
      * To be sure that the modified address will be used, this event must be sent
      * after a new stream event is received, and before attaching this stream to
      * a circuit.
      */
     public void redirectStream(String streamID, String address) throws IOException {
-        sendAndWaitForResponse("REDIRECTSTREAM "+streamID+" "+address+"\r\n",
-                               null);
+        sendAndWaitForResponse(REDIRECTSTREAM + " " + streamID + " " + address + "\r\n", null);
     }
 
     /** Tells Tor to close the stream identified by <b>streamID</b>.
@@ -732,14 +735,14 @@ public class TorControlConnection implements TorControlCommands {
      */
     public void closeStream(String streamID, byte reason)
         throws IOException {
-        sendAndWaitForResponse("CLOSESTREAM "+streamID+" "+reason+"\r\n",null);
+        sendAndWaitForResponse(CLOSESTREAM + " " + streamID + " " + reason + "\r\n", null);
     }
 
     /** Tells Tor to close the circuit identified by <b>circID</b>.
      * If <b>ifUnused</b> is true, do not close the circuit unless it is unused.
      */
     public void closeCircuit(String circID, boolean ifUnused) throws IOException {
-        sendAndWaitForResponse("CLOSECIRCUIT "+circID+
+        sendAndWaitForResponse(CLOSECIRCUIT + " " + circID +
                                (ifUnused?" IFUNUSED":"")+"\r\n", null);
     }
 
@@ -747,7 +750,7 @@ public class TorControlConnection implements TorControlCommands {
      * was added in Tor 0.2.2.28-beta.
      */
     public void takeOwnership() throws IOException {
-        sendAndWaitForResponse("TAKEOWNERSHIP\r\n", null);
+        sendAndWaitForResponse(TAKEOWNERSHIP + "\r\n", null);
     }
 
     /**
@@ -815,7 +818,7 @@ public class TorControlConnection implements TorControlCommands {
         if (portLines == null || portLines.size() < 1)
             throw new IllegalArgumentException("Must provide at least one port line");
         StringBuilder b = new StringBuilder();
-        b.append("ADD_ONION ").append(privKey);
+        b.append(ADD_ONION).append(" ").append(privKey);
         if (flags != null && flags.size() > 0) {
             b.append(" Flags=");
             String separator = "";
@@ -847,7 +850,7 @@ public class TorControlConnection implements TorControlCommands {
      * DEL_ONION was added in Tor 0.2.7.1-alpha.
      */
     public void delOnion(String hostname) throws IOException {
-        sendAndWaitForResponse("DEL_ONION " + hostname + "\r\n", null);
+        sendAndWaitForResponse(DEL_ONION + " " + hostname + "\r\n", null);
     }
 }
 

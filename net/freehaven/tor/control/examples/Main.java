@@ -119,8 +119,8 @@ public class Main implements TorControlCommands {
         // Usage signal [reload|shutdown|dump|debug|halt]
         TorControlConnection conn = getConnection(args, false);
         // distinguish shutdown signal from other signals
-        if ("SHUTDOWN".equalsIgnoreCase(args[1])
-        		|| "HALT".equalsIgnoreCase(args[1])) {
+        if (SIGNAL_SHUTDOWN.equalsIgnoreCase(args[1])
+                || SIGNAL_HALT.equalsIgnoreCase(args[1])) {
         	conn.shutdownTor(args[1].toUpperCase());
         } else {
         	conn.signal(args[1].toUpperCase());
