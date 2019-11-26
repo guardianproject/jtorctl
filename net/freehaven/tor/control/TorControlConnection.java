@@ -851,12 +851,5 @@ public class TorControlConnection implements TorControlCommands {
     public void delOnion(String hostname) throws IOException {
         sendAndWaitForResponse("DEL_ONION " + hostname + "\r\n", null);
     }
-
-    /** Tells Tor to forget any cached client state relating to the hidden
-     * service with the given hostname (excluding the .onion extension).
-     */
-    public void forgetHiddenService(String hostname) throws IOException {
-        sendAndWaitForResponse("HSFORGET " + hostname + "\r\n", null);
-    }
 }
 
