@@ -1,0 +1,32 @@
+apply plugin: 'java'
+
+def stdout = new ByteArrayOutputStream()
+exec {
+    commandLine 'git', 'describe', '--tags', '--always'
+    standardOutput = stdout
+}
+version = stdout.toString().trim()
+description = 'A Java library for controlling a Tor instance via its control port.'
+
+repositories {
+    maven { url 'file:///usr/share/maven-repo' }
+    mavenCentral()
+}
+
+dependencies {
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}

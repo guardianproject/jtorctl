@@ -3,3 +3,14 @@
 .classpath
 .project
 
+# gradle
+/.gradle/
+/build/
+local.properties
+/META-INF/
+
+# Android Studio / IntelliJ
+/.idea/
+*.iml
+
+
