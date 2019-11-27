@@ -76,14 +76,16 @@ public class TorControlConnection implements TorControlCommands {
         }
     }
     
-    /** Create a new TorControlConnection to communicate with Tor over
+    /**
+     * Create a new TorControlConnection to communicate with Tor over
      * a given socket.  After calling this constructor, it is typical to
      * call launchThread and authenticate. */
     public TorControlConnection(Socket connection) throws IOException {
         this(connection.getInputStream(), connection.getOutputStream());
     }
 
-    /** Create a new TorControlConnection to communicate with Tor over
+    /**
+     * Create a new TorControlConnection to communicate with Tor over
      * an arbitrary pair of data streams.
      */
     public TorControlConnection(InputStream i, OutputStream o) {
@@ -208,8 +210,10 @@ public class TorControlConnection implements TorControlCommands {
         return lst;
     }
 
-    /** Helper: decode a CMD_EVENT command and dispatch it to our
-     * EventHandler (if any). */
+    /**
+     * Helper: decode a CMD_EVENT command and dispatch it to our
+     * EventHandler (if any).
+     */
     protected void handleEvent(ArrayList<ReplyLine> events) {
         if (handler == null)
             return;
@@ -255,27 +259,31 @@ public class TorControlConnection implements TorControlCommands {
     }
 
 
-    /** Sets <b>w</b> as the PrintWriter for debugging output, 
-    * which writes out all messages passed between Tor and the controller.  
-    * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
-    * by "\<\<"
-    */
+    /**
+     * Sets <b>w</b> as the PrintWriter for debugging output,
+     * which writes out all messages passed between Tor and the controller.
+     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
+     * by "\<\<"
+     */
     public void setDebugging(PrintWriter w) {
         debugOutput = w;
     }
-    
-    /** Sets <b>s</b> as the PrintStream for debugging output, 
-    * which writes out all messages passed between Tor and the controller.  
-    * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
-    * by "\<\<"
-    */
+
+    /**
+     * Sets <b>s</b> as the PrintStream for debugging output,
+     * which writes out all messages passed between Tor and the controller.
+     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
+     * by "\<\<"
+     */
     public void setDebugging(PrintStream s) {
         debugOutput = new PrintWriter(s, true);
     }
 
-    /** Set the EventHandler object that will be notified of any
+    /**
+     * Set the EventHandler object that will be notified of any
      * events Tor delivers to this connection.  To make Tor send us
-     * events, call setEvents(). */
+     * events, call setEvents().
+     */
     public void setEventHandler(EventHandler handler) {
         this.handler = handler;
     }
@@ -311,7 +319,9 @@ public class TorControlConnection implements TorControlCommands {
             launchThread(true);
     }
 
-    /** helper: implement the main background loop. */
+    /**
+     * helper: implement the main background loop.
+     */
     protected void react() throws IOException {
         while (true) {
             ArrayList<ReplyLine> lst = readReply();
@@ -342,7 +352,10 @@ public class TorControlConnection implements TorControlCommands {
         }
     }
 
-    /** Change the value of the configuration option 'key' to 'val'.
+    /**
+     * Change the value of the configuration option 'key' to 'val'.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setconf">control-spec: SETCONF</a>
      */
     public void setConf(String key, String value) throws IOException {
         List<String> lst = new ArrayList<String>();
@@ -350,7 +363,11 @@ public class TorControlConnection implements TorControlCommands {
         setConf(lst);
     }
 
-    /** Change the values of the configuration options stored in kvMap. */
+    /**
+     * Change the values of the configuration options stored in kvMap.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setconf">control-spec: SETCONF</a>
+     */
     public void setConf(Map<String, String> kvMap) throws IOException {
         List<String> lst = new ArrayList<String>();
         for (Iterator<Map.Entry<String,String>> it = kvMap.entrySet().iterator(); it.hasNext(); ) {
@@ -360,25 +377,28 @@ public class TorControlConnection implements TorControlCommands {
         setConf(lst);
     }
 
-    /** Changes the values of the configuration options stored in
+    /**
+     * Changes the values of the configuration options stored in
      * <b>kvList</b>.  Each list element in <b>kvList</b> is expected to be
      * String of the format "key value".
-     *
+     * <p>
      * Tor behaves as though it had just read each of the key-value pairs
      * from its configuration file.  Keywords with no corresponding values have
      * their configuration values reset to their defaults.  setConf is
      * all-or-nothing: if there is an error in any of the configuration settings,
      * Tor sets none of them.
-     *
+     * <p>
      * When a configuration option takes multiple values, or when multiple
      * configuration keys form a context-sensitive group (see getConf below), then
      * setting any of the options in a setConf command is taken to reset all of
      * the others.  For example, if two ORBindAddress values are configured, and a
      * command arrives containing a single ORBindAddress value, the new
      * command's value replaces the two old values.
-     * 
+     * <p>
      * To remove all settings for a given option entirely (and go back to its
      * default value), include a String in <b>kvList</b> containing the key and no value.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setconf">control-spec: SETCONF</a>
      */
     public void setConf(Collection<String> kvList) throws IOException {
         if (kvList.size() == 0)
@@ -396,9 +416,12 @@ public class TorControlConnection implements TorControlCommands {
         sendAndWaitForResponse(b.toString(), null);
     }
     
-    /** Try to reset the values listed in the collection 'keys' to their
+    /**
+     * Try to reset the values listed in the collection 'keys' to their
      * default values.
-     **/
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#resetconf">control-spec: RESETCONF</a>
+     */
     public void resetConf(Collection<String> keys) throws IOException {
         if (keys.size() == 0)
             return;
@@ -411,24 +434,31 @@ public class TorControlConnection implements TorControlCommands {
         sendAndWaitForResponse(b.toString(), null);
     }
 
-    /** Return the value of the configuration option 'key' */
+    /**
+     * Return the value of the configuration option 'key'
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#getconf">control-spec: GETCONF</a>
+     */
     public List<ConfigEntry> getConf(String key) throws IOException {
         List<String> lst = new ArrayList<String>();
         lst.add(key);
         return getConf(lst);
     }
 
-    /** Requests the values of the configuration variables listed in <b>keys</b>.
+    /**
+     * Requests the values of the configuration variables listed in <b>keys</b>.
      * Results are returned as a list of ConfigEntry objects.
-     * 
+     * <p>
      * If an option appears multiple times in the configuration, all of its
      * key-value pairs are returned in order.
-     *
+     * <p>
      * Some options are context-sensitive, and depend on other options with
      * different keywords.  These cannot be fetched directly.  Currently there
      * is only one such option: clients should use the "HiddenServiceOptions"
      * virtual keyword to get all HiddenServiceDir, HiddenServicePort,
      * HiddenServiceNodes, and HiddenServiceExcludeNodes option settings.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#getconf">control-spec: GETCONF</a>
      */
     public List<ConfigEntry> getConf(Collection<String> keys) throws IOException {
         StringBuffer sb = new StringBuffer(GETCONF);
@@ -451,13 +481,16 @@ public class TorControlConnection implements TorControlCommands {
         return result;
     }
 
-    /** Request that the server inform the client about interesting events.
-     * Each element of <b>events</b> is one of the following Strings: 
+    /**
+     * Request that the server inform the client about interesting events.
+     * Each element of <b>events</b> is one of the following Strings:
      * ["CIRC" | "STREAM" | "ORCONN" | "BW" | "DEBUG" |
-     *  "INFO" | "NOTICE" | "WARN" | "ERR" | "NEWDESC" | "ADDRMAP"] .
-     * 
+     * "INFO" | "NOTICE" | "WARN" | "ERR" | "NEWDESC" | "ADDRMAP"] .
+     * <p>
      * Any events not listed in the <b>events</b> are turned off; thus, calling
      * setEvents with an empty <b>events</b> argument turns off all event reporting.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setevents">control-spec: SETEVENTS</a>
      */
     public void setEvents(List<String> events) throws IOException {
         StringBuffer sb = new StringBuffer(SETEVENTS);
@@ -468,39 +501,46 @@ public class TorControlConnection implements TorControlCommands {
         sendAndWaitForResponse(sb.toString(), null);
     }
 
-    /** Authenticates the controller to the Tor server.
-     *
-     * By default, the current Tor implementation trusts all local users, and 
+    /**
+     * Authenticates the controller to the Tor server.
+     * <p>
+     * By default, the current Tor implementation trusts all local users, and
      * the controller can authenticate itself by calling authenticate(new byte[0]).
-     *
+     * <p>
      * If the 'CookieAuthentication' option is true, Tor writes a "magic cookie"
      * file named "control_auth_cookie" into its data directory.  To authenticate,
      * the controller must send the contents of this file in <b>auth</b>.
-     * 
+     * <p>
      * If the 'HashedControlPassword' option is set, <b>auth</b> must contain the salted
      * hash of a secret password.  The salted hash is computed according to the
      * S2K algorithm in RFC 2440 (OpenPGP), and prefixed with the s2k specifier.
      * This is then encoded in hexadecimal, prefixed by the indicator sequence
      * "16:".
-     *
+     * <p>
      * You can generate the salt of a password by calling
-     *       'tor --hash-password <password>'
-     * or by using the provided PasswordDigest class.
+     * {@code tor --hash-password <password>}
+     * or by using the provided {@link PasswordDigest} class.
      * To authenticate under this scheme, the controller sends Tor the original
      * secret that was used to generate the password.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#authenticate">control-spec: AUTHENTICATE</a>
      */
     public void authenticate(byte[] auth) throws IOException {
         String cmd = AUTHENTICATE + " " + Bytes.hex(auth) + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
 
-    /** Instructs the server to write out its configuration options into its torrc.
+    /**
+     * Instructs the server to write out its configuration options into its torrc.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#saveconf">control-spec: SAVECONF</a>
      */
     public void saveConf() throws IOException {
         sendAndWaitForResponse(SAVECONF + "\r\n", null);
     }
 
-    /** Sends a signal from the controller to the Tor server.
+    /**
+     * Sends a signal from the controller to the Tor server.
      * <b>signal</b> is one of the following Strings:
      * <ul>
      * <li>"RELOAD" or "HUP" :  Reload config items, refetch directory</li>
@@ -510,14 +550,20 @@ public class TorControlConnection implements TorControlCommands {
      * <li>"DEBUG" or "USR2" : Debug: switch all open logs to loglevel debug</li>
      * <li>"HALT" or "TERM" : Immediate shutdown: clean up and exit now</li>
      * </ul>
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
      */
     public void signal(String signal) throws IOException {
         String cmd = SIGNAL + " " + signal + "\r\n";
         sendAndWaitForResponse(cmd, null);
     }
 
-    /** Send a signal to the Tor process to shut it down or halt it.
-     * Does not wait for a response. */
+    /**
+     * Send a signal to the Tor process to shut it down or halt it.
+     * Does not wait for a response.
+     *
+     * @see #signal(String)
+     */
     public void shutdownTor(String signal) throws IOException {
         String s = SIGNAL + " " + signal + "\r\n";
         Waiter w = new Waiter();
@@ -529,18 +575,23 @@ public class TorControlConnection implements TorControlCommands {
         }
     }
 
-    /** Tells Tor to exit when this control connection is closed. This command
+    /**
+     * Tells Tor to exit when this control connection is closed. This command
      * was added in Tor 0.2.2.28-beta.
+     *
+     * @see #dropOwnership()
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#takeownership">control-spec: TAKEOWNERSHIP</a>
      */
     public void takeOwnership() throws IOException {
         sendAndWaitForResponse(TAKEOWNERSHIP + "\r\n", null);
     }
 
-    /** Tells the Tor server that future SOCKS requests for connections to a set of original
+    /**
+     * Tells the Tor server that future SOCKS requests for connections to a set of original
      * addresses should be replaced with connections to the specified replacement
      * addresses.  Each element of <b>kvLines</b> is a String of the form
      * "old-address new-address".  This function returns the new address mapping.
-     *
+     * <p>
      * The client may decline to provide a body for the original address, and
      * instead send a special null address ("0.0.0.0" for IPv4, "::0" for IPv6, or
      * "." for hostname), signifying that the server should choose the original
@@ -548,16 +599,20 @@ public class TorControlConnection implements TorControlCommands {
      * should ensure that it returns an element of address space that is unlikely
      * to be in actual use.  If there is already an address mapped to the
      * destination address, the server may reuse that mapping.
-     * 
+     * <p>
      * If the original address is already mapped to a different address, the old
      * mapping is removed.  If the original address and the destination address
      * are the same, the server removes any mapping in place for the original
      * address.
-     *
+     * <p>
      * Mappings set by the controller last until the Tor process exits:
      * they never expire. If the controller wants the mapping to last only
      * a certain time, then it must explicitly un-map the address when that
      * time has elapsed.
+     *
+     * @see #mapAddresses(Map)
+     * @see #mapAddress(String, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#mapaddress">control-spec: MAPADDRESS</a>
      */
     public Map<String,String> mapAddresses(Collection<String> kvLines) throws IOException {
         StringBuffer sb = new StringBuffer(MAPADDRESS);
@@ -579,6 +634,11 @@ public class TorControlConnection implements TorControlCommands {
         return result;
     }
 
+    /**
+     * @see #mapAddresses(Collection)
+     * @see #mapAddress(String, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#mapaddress">control-spec: MAPADDRESS</a>
+     */
     public Map<String,String> mapAddresses(Map<String,String> addresses) throws IOException {
         List<String> kvList = new ArrayList<String>();
         for (Iterator<Map.Entry<String, String>> it = addresses.entrySet().iterator(); it.hasNext(); ) {
@@ -588,6 +648,11 @@ public class TorControlConnection implements TorControlCommands {
         return mapAddresses(kvList);
     }
 
+    /**
+     * @see #mapAddresses(Collection)
+     * @see #mapAddresses(Map)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#mapaddress">control-spec: MAPADDRESS</a>
+     */
     public String mapAddress(String fromAddr, String toAddr) throws IOException {
         List<String> lst = new ArrayList<String>();
         lst.add(fromAddr+" "+toAddr+"\n");
@@ -595,13 +660,14 @@ public class TorControlConnection implements TorControlCommands {
         return m.get(fromAddr);
     }
 
-    /** Queries the Tor server for keyed values that are not stored in the torrc
+    /**
+     * Queries the Tor server for keyed values that are not stored in the torrc
      * configuration file.  Returns a map of keys to values.
-     *
+     * <p>
      * Recognized keys include:
      * <ul>
      * <li>"version" : The version of the server's software, including the name
-     *  of the software. (example: "Tor 0.0.9.4")</li>
+     * of the software. (example: "Tor 0.0.9.4")</li>
      * <li>"desc/id/<OR identity>" or "desc/name/<OR nickname>" : the latest server
      * descriptor for a given OR, NUL-terminated.  If no such OR is known, the
      * corresponding value is an empty string.</li>
@@ -624,6 +690,9 @@ public class TorControlConnection implements TorControlCommands {
      * <li>"orconn-status" : A series of lines as for an OR connection status event.  Each is of the
      * form: "ServerID ORStatus"</li>
      * </ul>
+     *
+     * @see #getInfo(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo">control-spec: GETINFO</a>
      */
     public Map<String,String> getInfo(Collection<String> keys) throws IOException {
         StringBuffer sb = new StringBuffer(GETINFO);
@@ -649,10 +718,13 @@ public class TorControlConnection implements TorControlCommands {
         }
         return m;
     }
-    
-    
-    
-    /** Return the value of the information field 'key' */
+
+    /**
+     * Return the value of the information field 'key'
+     *
+     * @see #getInfo(Collection)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo">control-spec: GETINFO</a>
+     */
     public String getInfo(String key) throws IOException {
         List<String> lst = new ArrayList<String>();
         lst.add(key);
@@ -660,67 +732,81 @@ public class TorControlConnection implements TorControlCommands {
         return  m.get(key);
     }
 
-    /** An extendCircuit request takes one of two forms: either the <b>circID</b> is zero, in
+    /**
+     * An extendCircuit request takes one of two forms: either the <b>circID</b> is zero, in
      * which case it is a request for the server to build a new circuit according
      * to the specified path, or the <b>circID</b> is nonzero, in which case it is a
      * request for the server to extend an existing circuit with that ID according
      * to the specified <b>path</b>.
-     *
+     * <p>
      * If successful, returns the Circuit ID of the (maybe newly created) circuit.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#extendcircuit">control-spec: EXTENDCIRCUIT</a>
      */
     public String extendCircuit(String circID, String path) throws IOException {
         List<ReplyLine> lst = sendAndWaitForResponse(
                 EXTENDCIRCUIT + " " + circID + " " + path + "\r\n", null);
         return (lst.get(0)).msg;
     }
-    
-    /** Informs the Tor server that the stream specified by <b>streamID</b> should be
-     * associated with the circuit specified by <b>circID</b>.  
-     * 
+
+    /**
+     * Informs the Tor server that the stream specified by <b>streamID</b> should be
+     * associated with the circuit specified by <b>circID</b>.
+     * <p>
      * Each stream may be associated with
      * at most one circuit, and multiple streams may share the same circuit.
      * Streams can only be attached to completed circuits (that is, circuits that
      * have sent a circuit status "BUILT" event or are listed as built in a
      * getInfo circuit-status request).
-     *
+     * <p>
      * If <b>circID</b> is 0, responsibility for attaching the given stream is
      * returned to Tor.
-     *
+     * <p>
      * By default, Tor automatically attaches streams to
      * circuits itself, unless the configuration variable
      * "__LeaveStreamsUnattached" is set to "1".  Attempting to attach streams
      * via TC when "__LeaveStreamsUnattached" is false may cause a race between
      * Tor and the controller, as both attempt to attach streams to circuits.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#attachstream">control-spec: ATTACHSTREAM</a>
      */
     public void attachStream(String streamID, String circID)
         throws IOException {
         sendAndWaitForResponse(ATTACHSTREAM + " " + streamID + " " + circID + "\r\n", null);
     }
 
-    /** Tells Tor about the server descriptor in <b>desc</b>.
-     *
+    /**
+     * Tells Tor about the server descriptor in <b>desc</b>.
+     * <p>
      * The descriptor, when parsed, must contain a number of well-specified
      * fields, including fields for its nickname and identity.
+     * <p>
+     * TODO More documentation here on format of desc?
+     * No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#postdescriptor">control-spec: POSTDESCRIPTOR</a>
      */
-    // More documentation here on format of desc?
-    // No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
     public String postDescriptor(String desc) throws IOException {
         List<ReplyLine> lst = sendAndWaitForResponse(POSTDESCRIPTOR + "\r\n", desc);
         return (lst.get(0)).msg;
     }
 
-    /** Tells Tor to change the exit address of the stream identified by <b>streamID</b>
+    /**
+     * Tells Tor to change the exit address of the stream identified by <b>streamID</b>
      * to <b>address</b>. No remapping is performed on the new provided address.
-     *
+     * <p>
      * To be sure that the modified address will be used, this event must be sent
      * after a new stream event is received, and before attaching this stream to
      * a circuit.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#redirectstream">control-spec: REDIRECTSTREAM</a>
      */
     public void redirectStream(String streamID, String address) throws IOException {
         sendAndWaitForResponse(REDIRECTSTREAM + " " + streamID + " " + address + "\r\n", null);
     }
 
-    /** Tells Tor to close the stream identified by <b>streamID</b>.
+    /**
+     * Tells Tor to close the stream identified by <b>streamID</b>.
      * <b>reason</b> should be one of the Tor RELAY_END reasons given in tor-spec.txt, as a decimal:
      * <ul>
      * <li>1 -- REASON_MISC           (catch-all for unlisted reasons)</li>
@@ -737,16 +823,21 @@ public class TorControlConnection implements TorControlCommands {
      * <li>12 -- REASON_CONNRESET      (Connection was unexpectedly reset)</li>
      * <li>13 -- REASON_TORPROTOCOL    (Sent when closing connection because of Tor protocol violations)</li>
      * </ul>
-     *
+     * <p>
      * Tor may hold the stream open for a while to flush any data that is pending.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#closestream">control-spec: CLOSESTREAM</a>
      */
     public void closeStream(String streamID, byte reason)
         throws IOException {
         sendAndWaitForResponse(CLOSESTREAM + " " + streamID + " " + reason + "\r\n", null);
     }
 
-    /** Tells Tor to close the circuit identified by <b>circID</b>.
+    /**
+     * Tells Tor to close the circuit identified by <b>circID</b>.
      * If <b>ifUnused</b> is true, do not close the circuit unless it is unused.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#closecircuit">control-spec: CLOSECIRCUIT</a>
      */
     public void closeCircuit(String circID, boolean ifUnused) throws IOException {
         sendAndWaitForResponse(CLOSECIRCUIT + " " + circID +
@@ -758,6 +849,13 @@ public class TorControlConnection implements TorControlCommands {
      * supported algorithm.
      * <p/>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see #addOnion(Map, boolean, boolean)
+     * @see #addOnion(String, Map)
+     * @see #addOnion(String, Map, List)
+     * @see #addOnion(String, Map, boolean, boolean)
+     * @see #delOnion(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#add_onion">control-spec: ADD_ONION</a>
      */
     public Map<String,String> addOnion(Map<Integer,String> portLines)
                                        throws IOException {
@@ -769,6 +867,13 @@ public class TorControlConnection implements TorControlCommands {
      * supported algorithm.
      * <p/>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see #addOnion(Map)
+     * @see #addOnion(String, Map)
+     * @see #addOnion(String, Map, List)
+     * @see #addOnion(String, Map, boolean, boolean)
+     * @see #delOnion(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#add_onion">control-spec: ADD_ONION</a>
      */
     public Map<String,String> addOnion(Map<Integer,String> portLines,
                                        boolean ephemeral, boolean detach)
@@ -780,6 +885,13 @@ public class TorControlConnection implements TorControlCommands {
      * Tells Tor to set up an onion service using the provided private key.
      * <p/>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see #addOnion(Map)
+     * @see #addOnion(Map, boolean, boolean)
+     * @see #addOnion(String, Map, List)
+     * @see #addOnion(String, Map, boolean, boolean)
+     * @see #delOnion(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#add_onion">control-spec: ADD_ONION</a>
      */
     public Map<String,String> addOnion(String privKey,
                                        Map<Integer,String> portLines)
@@ -789,8 +901,15 @@ public class TorControlConnection implements TorControlCommands {
 
     /**
      * Tells Tor to set up an onion service using the provided private key.
-     * <p/>
+     * <p>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see #addOnion(Map)
+     * @see #addOnion(Map, boolean, boolean)
+     * @see #addOnion(String, Map)
+     * @see #addOnion(String, Map, List)
+     * @see #delOnion(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#add_onion">control-spec: ADD_ONION</a>
      */
     public Map<String,String> addOnion(String privKey,
                                        Map<Integer,String> portLines,
@@ -806,8 +925,15 @@ public class TorControlConnection implements TorControlCommands {
 
     /**
      * Tells Tor to set up an onion service.
-     * <p/>
+     * <p>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see #addOnion(Map)
+     * @see #addOnion(Map, boolean, boolean)
+     * @see #addOnion(String, Map)
+     * @see #addOnion(String, Map, boolean, boolean)
+     * @see #delOnion(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#add_onion">control-spec: ADD_ONION</a>
      */
     public Map<String,String> addOnion(String privKey,
                                        Map<Integer,String> portLines,
@@ -848,9 +974,10 @@ public class TorControlConnection implements TorControlCommands {
      * addOnion(). The hostname excludes the .onion extension.
      * <p/>
      * DEL_ONION was added in Tor 0.2.7.1-alpha.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#del_onion">control-spec: DEL_ONION</a>
      */
     public void delOnion(String hostname) throws IOException {
         sendAndWaitForResponse(DEL_ONION + " " + hostname + "\r\n", null);
     }
 }
-
