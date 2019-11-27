@@ -484,9 +484,39 @@ public class TorControlConnection implements TorControlCommands {
     /**
      * Request that the server inform the client about interesting events.
      * Each element of <b>events</b> is one of the following Strings:
-     * ["CIRC" | "STREAM" | "ORCONN" | "BW" | "DEBUG" |
-     * "INFO" | "NOTICE" | "WARN" | "ERR" | "NEWDESC" | "ADDRMAP"] .
-     * <p>
+     * <ul>
+     * <li>{@link TorControlCommands#EVENT_CIRCUIT_STATUS}: "CIRC"</li>
+     * <li>{@link TorControlCommands#EVENT_CIRCUIT_STATUS_MINOR}: "CIRC_MINOR"</li>
+     * <li>{@link TorControlCommands#EVENT_STREAM_STATUS}: "STREAM"</li>
+     * <li>{@link TorControlCommands#EVENT_OR_CONN_STATUS}: "ORCONN"</li>
+     * <li>{@link TorControlCommands#EVENT_BANDWIDTH_USED}: "BW"</li>
+     * <li>{@link TorControlCommands#EVENT_DEBUG_MSG}: "DEBUG"</li>
+     * <li>{@link TorControlCommands#EVENT_INFO_MSG}: "INFO"</li>
+     * <li>{@link TorControlCommands#EVENT_NOTICE_MSG}: "NOTICE"</li>
+     * <li>{@link TorControlCommands#EVENT_WARN_MSG}: "WARN"</li>
+     * <li>{@link TorControlCommands#EVENT_ERR_MSG}: "ERR"</li>
+     * <li>{@link TorControlCommands#EVENT_NEW_DESC}: "NEWDESC"</li>
+     * <li>{@link TorControlCommands#EVENT_ADDRMAP}: "ADDRMAP"</li>
+     * <li>{@link TorControlCommands#EVENT_DESCCHANGED}: "DESCCHANGED"</li>
+     * <li>{@link TorControlCommands#EVENT_NS}: "NS"</li>
+     * <li>{@link TorControlCommands#EVENT_STATUS_GENERAL}: "STATUS_GENERAL"</li>
+     * <li>{@link TorControlCommands#EVENT_STATUS_CLIENT}: "STATUS_CLIENT"</li>
+     * <li>{@link TorControlCommands#EVENT_STATUS_SERVER}: "STATUS_SERVER"</li>
+     * <li>{@link TorControlCommands#EVENT_GUARD}: "GUARD"</li>
+     * <li>{@link TorControlCommands#EVENT_STREAM_BANDWIDTH_USED}: "STREAM_BW"</li>
+     * <li>{@link TorControlCommands#EVENT_CLIENTS_SEEN}: "CLIENTS_SEEN"</li>
+     * <li>{@link TorControlCommands#EVENT_NEWCONSENSUS}: "NEWCONSENSUS"</li>
+     * <li>{@link TorControlCommands#EVENT_BUILDTIMEOUT_SET}: "BUILDTIMEOUT_SET"</li>
+     * <li>{@link TorControlCommands#EVENT_GOT_SIGNAL}: "SIGNAL"</li>
+     * <li>{@link TorControlCommands#EVENT_CONF_CHANGED}: "CONF_CHANGED"</li>
+     * <li>{@link TorControlCommands#EVENT_CONN_BW}: "CONN_BW"</li>
+     * <li>{@link TorControlCommands#EVENT_CELL_STATS}: "CELL_STATS"</li>
+     * <li>{@link TorControlCommands#EVENT_CIRC_BANDWIDTH_USED}: "CIRC_BW"</li>
+     * <li>{@link TorControlCommands#EVENT_TRANSPORT_LAUNCHED}: "TRANSPORT_LAUNCHED"</li>
+     * <li>{@link TorControlCommands#EVENT_HS_DESC}: "HS_DESC"</li>
+     * <li>{@link TorControlCommands#EVENT_HS_DESC_CONTENT}: "HS_DESC_CONTENT"</li>
+     * <li>{@link TorControlCommands#EVENT_NETWORK_LIVENESS}: "NETWORK_LIVENESS"</li>
+     * </ul>
      * Any events not listed in the <b>events</b> are turned off; thus, calling
      * setEvents with an empty <b>events</b> argument turns off all event reporting.
      *
