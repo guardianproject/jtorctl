@@ -46,74 +46,171 @@ public interface TorControlCommands {
     public static final short CMD_ERROR = 0x0000;
     public static final short CMD_DONE = 0x0001;
     public static final short CMD_SETCONF = 0x0002;
-    public static final short CMD_GETCONF = 0x0003;
-    public static final short CMD_CONFVALUE = 0x0004;
-    public static final short CMD_SETEVENTS = 0x0005;
-    public static final short CMD_EVENT = 0x0006;
-    public static final short CMD_AUTH = 0x0007;
+    public static final short CMD_RESETCONF = 0x0003;
+    public static final short CMD_GETCONF = 0x0004;
+    public static final short CMD_LOADCONF = 0x0005;
+    public static final short CMD_SETEVENTS = 0x0006;
+    public static final short CMD_AUTHENTICATE = 0x0007;
     public static final short CMD_SAVECONF = 0x0008;
     public static final short CMD_SIGNAL = 0x0009;
-    public static final short CMD_MAPADDRESS = 0x000A;
-    public static final short CMD_GETINFO = 0x000B;
-    public static final short CMD_INFOVALUE = 0x000C;
-    public static final short CMD_EXTENDCIRCUIT = 0x000D;
-    public static final short CMD_ATTACHSTREAM = 0x000E;
-    public static final short CMD_POSTDESCRIPTOR = 0x000F;
-    public static final short CMD_FRAGMENTHEADER = 0x0010;
-    public static final short CMD_FRAGMENT = 0x0011;
-    public static final short CMD_REDIRECTSTREAM = 0x0012;
-    public static final short CMD_CLOSESTREAM = 0x0013;
-    public static final short CMD_CLOSECIRCUIT = 0x0014;
+    public static final short CMD_TAKEOWNERSHIP = 0x000A;
+    public static final short CMD_DROPOWNERSHIP = 0x000B;
+    public static final short CMD_MAPADDRESS = 0x000C;
+    public static final short CMD_GETINFO = 0x000D;
+    public static final short CMD_EXTENDCIRCUIT = 0x000E;
+    public static final short CMD_SETCIRCUITPURPOSE = 0x000F;
+    @Deprecated
+    public static final short CMD_SETROUTERPURPOSE = 0x0010;
+    public static final short CMD_ATTACHSTREAM = 0x0011;
+    public static final short CMD_POSTDESCRIPTOR = 0x0012;
+    public static final short CMD_REDIRECTSTREAM = 0x0013;
+    public static final short CMD_CLOSESTREAM = 0x0014;
+    public static final short CMD_CLOSECIRCUIT = 0x0015;
+    public static final short CMD_USEFEATURE = 0x0016;
+    public static final short CMD_RESOLVE = 0x0017;
+    public static final short CMD_PROTOCOLINFO = 0x0018;
+    public static final short CMD_AUTHCHALLENGE = 0x0019;
+    public static final short CMD_DROPGUARDS = 0x001A;
+    public static final short CMD_HSFETCH = 0x001B;
+    public static final short CMD_HSPOST = 0x001C;
+    public static final short CMD_ADD_ONION = 0x001D;
+    public static final short CMD_DEL_ONION = 0x001E;
 
     public static final String[] CMD_NAMES = {
         "ERROR",
         "DONE",
         "SETCONF",
+        "RESETCONF",
         "GETCONF",
-        "CONFVALUE",
+        "LOADCONF",
         "SETEVENTS",
-        "EVENT",
-        "AUTH",
+        "AUTHENTICATE",
         "SAVECONF",
         "SIGNAL",
+        "TAKEOWNERSHIP",
+        "DROPOWNERSHIP",
         "MAPADDRESS",
         "GETINFO",
-        "INFOVALUE",
         "EXTENDCIRCUIT",
+        "SETCIRCUITPURPOSE",
+        "SETROUTERPURPOSE",
         "ATTACHSTREAM",
         "POSTDESCRIPTOR",
-        "FRAGMENTHEADER",
-        "FRAGMENT",
         "REDIRECTSTREAM",
         "CLOSESTREAM",
         "CLOSECIRCUIT",
+        "USEFEATURE",
+        "RESOLVE",
+        "PROTOCOLINFO",
+        "AUTHCHALLENGE",
+        "DROPGUARDS",
+        "HSFETCH",
+        "HSPOST",
+        "ADD_ONION",
+        "DEL_ONION",
     };
 
-    public static final short EVENT_CIRCSTATUS = 0x0001;
-    public static final short EVENT_STREAMSTATUS = 0x0002;
-    public static final short EVENT_ORCONNSTATUS = 0x0003;
-    public static final short EVENT_BANDWIDTH = 0x0004;
-    public static final short EVENT_NEWDESCRIPTOR = 0x0006;
-    public static final short EVENT_MSG_DEBUG = 0x0007;
-    public static final short EVENT_MSG_INFO = 0x0008;
-    public static final short EVENT_MSG_NOTICE = 0x0009;
-    public static final short EVENT_MSG_WARN = 0x000A;
-    public static final short EVENT_MSG_ERROR = 0x000B;
+    public static final String CIRCUIT_PURPOSE_C_GENERAL = "general";
+    public static final String CIRCUIT_PURPOSE_CONTROLLER = "controller";
+
+    public static final short EVENT_CIRCUIT_STATUS_INDEX = 0x0001;
+    public static final short EVENT_CIRCUIT_STATUS_MINOR_INDEX = 0x0002;
+    public static final short EVENT_STREAM_STATUS_INDEX = 0x0003;
+    public static final short EVENT_OR_CONN_STATUS_INDEX = 0x0004;
+    public static final short EVENT_BANDWIDTH_USED_INDEX = 0x0005;
+    public static final short EVENT_DEBUG_MSG_INDEX = 0x0006;
+    public static final short EVENT_INFO_MSG_INDEX = 0x0007;
+    public static final short EVENT_NOTICE_MSG_INDEX = 0x0008;
+    public static final short EVENT_WARN_MSG_INDEX = 0x0009;
+    public static final short EVENT_ERR_MSG_INDEX = 0x000A;
+    public static final short EVENT_NEW_DESC_INDEX = 0x000B;
+    public static final short EVENT_ADDRMAP_INDEX = 0x000C;
+    public static final short EVENT_DESCCHANGED_INDEX = 0x000D;
+    public static final short EVENT_NS_INDEX = 0x000E;
+    public static final short EVENT_STATUS_GENERAL_INDEX = 0x000F;
+    public static final short EVENT_STATUS_CLIENT_INDEX = 0x0010;
+    public static final short EVENT_STATUS_SERVER_INDEX = 0x0011;
+    public static final short EVENT_GUARD_INDEX = 0x0012;
+    public static final short EVENT_STREAM_BANDWIDTH_USED_INDEX = 0x0013;
+    public static final short EVENT_CLIENTS_SEEN_INDEX = 0x0014;
+    public static final short EVENT_NEWCONSENSUS_INDEX = 0x0015;
+    public static final short EVENT_BUILDTIMEOUT_SET_INDEX = 0x0016;
+    public static final short EVENT_GOT_SIGNAL_INDEX = 0x0017;
+    public static final short EVENT_CONF_CHANGED_INDEX = 0x0018;
+    public static final short EVENT_CONN_BW_INDEX = 0x0019;
+    public static final short EVENT_CELL_STATS_INDEX = 0x001A;
+    public static final short EVENT_CIRC_BANDWIDTH_USED_INDEX = 0x001B;
+    public static final short EVENT_TRANSPORT_LAUNCHED_INDEX = 0x001C;
+    public static final short EVENT_HS_DESC_INDEX = 0x001D;
+    public static final short EVENT_HS_DESC_CONTENT_INDEX = 0x001E;
+    public static final short EVENT_NETWORK_LIVENESS_INDEX = 0x001F;
 
     public static final String[] EVENT_NAMES = {
         "(0)",
         "CIRC",
+        "CIRC_MINOR",
         "STREAM",
         "ORCONN",
         "BW",
-        "OLDLOG",
-        "NEWDESC",
         "DEBUG",
         "INFO",
         "NOTICE",
         "WARN",
         "ERR",
+        "NEWDESC",
+        "ADDRMAP",
+        "DESCCHANGED",
+        "NS",
+        "STATUS_GENERAL",
+        "STATUS_CLIENT",
+        "STATUS_SERVER",
+        "GUARD",
+        "STREAM_BW",
+        "CLIENTS_SEEN",
+        "NEWCONSENSUS",
+        "BUILDTIMEOUT_SET",
+        "SIGNAL",
+        "CONF_CHANGED",
+        "CONN_BW",
+        "CELL_STATS",
+        "CIRC_BW",
+        "TRANSPORT_LAUNCHED",
+        "HS_DESC",
+        "HS_DESC_CONTENT",
+        "NETWORK_LIVENESS"
     };
+
+    public static final String EVENT_CIRCUIT_STATUS = "CIRC";
+    public static final String EVENT_CIRCUIT_STATUS_MINOR = "CIRC_MINOR";
+    public static final String EVENT_STREAM_STATUS = "STREAM";
+    public static final String EVENT_OR_CONN_STATUS = "ORCONN";
+    public static final String EVENT_BANDWIDTH_USED = "BW";
+    public static final String EVENT_DEBUG_MSG = "DEBUG";
+    public static final String EVENT_INFO_MSG = "INFO";
+    public static final String EVENT_NOTICE_MSG = "NOTICE";
+    public static final String EVENT_WARN_MSG = "WARN";
+    public static final String EVENT_ERR_MSG = "ERR";
+    public static final String EVENT_NEW_DESC = "NEWDESC";
+    public static final String EVENT_ADDRMAP = "ADDRMAP";
+    public static final String EVENT_DESCCHANGED = "DESCCHANGED";
+    public static final String EVENT_NS = "NS";
+    public static final String EVENT_STATUS_GENERAL = "STATUS_GENERAL";
+    public static final String EVENT_STATUS_CLIENT = "STATUS_CLIENT";
+    public static final String EVENT_STATUS_SERVER = "STATUS_SERVER";
+    public static final String EVENT_GUARD = "GUARD";
+    public static final String EVENT_STREAM_BANDWIDTH_USED = "STREAM_BW";
+    public static final String EVENT_CLIENTS_SEEN = "CLIENTS_SEEN";
+    public static final String EVENT_NEWCONSENSUS = "NEWCONSENSUS";
+    public static final String EVENT_BUILDTIMEOUT_SET = "BUILDTIMEOUT_SET";
+    public static final String EVENT_GOT_SIGNAL = "SIGNAL";
+    public static final String EVENT_CONF_CHANGED = "CONF_CHANGED";
+    public static final String EVENT_CONN_BW = "CONN_BW";
+    public static final String EVENT_CELL_STATS = "CELL_STATS";
+    public static final String EVENT_CIRC_BANDWIDTH_USED = "CIRC_BW";
+    public static final String EVENT_TRANSPORT_LAUNCHED = "TRANSPORT_LAUNCHED";
+    public static final String EVENT_HS_DESC = "HS_DESC";
+    public static final String EVENT_HS_DESC_CONTENT = "HS_DESC_CONTENT";
+    public static final String EVENT_NETWORK_LIVENESS = "NETWORK_LIVENESS";
 
     public static final byte CIRC_STATUS_LAUNCHED = 0x01;
     public static final byte CIRC_STATUS_BUILT = 0x02;
@@ -129,14 +226,21 @@ public interface TorControlCommands {
         "CLOSED",
     };
 
+    public static final String CIRC_EVENT_LAUNCHED = "LAUNCHED";
+    public static final String CIRC_EVENT_BUILT = "BUILT";
+    public static final String CIRC_EVENT_EXTENDED = "EXTENDED";
+    public static final String CIRC_EVENT_FAILED = "FAILED";
+    public static final String CIRC_EVENT_CLOSED = "CLOSED";
+
     public static final byte STREAM_STATUS_SENT_CONNECT = 0x00;
     public static final byte STREAM_STATUS_SENT_RESOLVE = 0x01;
     public static final byte STREAM_STATUS_SUCCEEDED = 0x02;
     public static final byte STREAM_STATUS_FAILED = 0x03;
     public static final byte STREAM_STATUS_CLOSED = 0x04;
-    public static final byte STREAM_STATUS_NEW_CONNECT = 0x05;
+    public static final byte STREAM_STATUS_NEW = 0x05;
     public static final byte STREAM_STATUS_NEW_RESOLVE = 0x06;
-    public static final byte STREAM_STATUS_DETACHED = 0x07;
+    public static final byte STREAM_STATUS_FAILED_RETRIABLE = 0x07;
+    public static final byte STREAM_STATUS_REMAP = 0x08;
 
     public static final String[] STREAM_STATUS_NAMES = {
         "SENT_CONNECT",
@@ -144,19 +248,37 @@ public interface TorControlCommands {
         "SUCCEEDED",
         "FAILED",
         "CLOSED",
-        "NEW_CONNECT",
+        "NEW",
         "NEW_RESOLVE",
-        "DETACHED"
+        "FAILED_RETRIABLE",
+        "REMAP"
     };
+
+    public static final String STREAM_EVENT_SENT_CONNECT = "SENT_CONNECT";
+    public static final String STREAM_EVENT_SENT_RESOLVE = "SENT_RESOLVE";
+    public static final String STREAM_EVENT_SUCCEEDED = "SUCCEEDED";
+    public static final String STREAM_EVENT_FAILED = "FAILED";
+    public static final String STREAM_EVENT_CLOSED = "CLOSED";
+    public static final String STREAM_EVENT_NEW = "NEW";
+    public static final String STREAM_EVENT_NEW_RESOLVE = "NEW_RESOLVE";
+    public static final String STREAM_EVENT_FAILED_RETRIABLE = "FAILED_RETRIABLE";
+    public static final String STREAM_EVENT_REMAP = "REMAP";
 
     public static final byte OR_CONN_STATUS_LAUNCHED = 0x00;
     public static final byte OR_CONN_STATUS_CONNECTED = 0x01;
     public static final byte OR_CONN_STATUS_FAILED = 0x02;
     public static final byte OR_CONN_STATUS_CLOSED = 0x03;
+    public static final byte OR_CONN_STATUS_NEW = 0x04;
 
     public static final String[] OR_CONN_STATUS_NAMES = {
-        "LAUNCHED","CONNECTED","FAILED","CLOSED"
+        "LAUNCHED", "CONNECTED", "FAILED", "CLOSED", "NEW"
     };
+
+    public static final String OR_CONN_EVENT_LAUNCHED = "LAUNCHED";
+    public static final String OR_CONN_EVENT_CONNECTED = "CONNECTED";
+    public static final String OR_CONN_EVENT_FAILED = "FAILED";
+    public static final String OR_CONN_EVENT_CLOSED = "CLOSED";
+    public static final String OR_CONN_EVENT_NEW = "NEW";
 
     public static final byte SIGNAL_HUP = 0x01;
     public static final byte SIGNAL_INT = 0x02;
@@ -182,4 +304,26 @@ public interface TorControlCommands {
 
     public static final String HS_ADDRESS = "onionAddress";
     public static final String HS_PRIVKEY = "onionPrivKey";
+
+    @Deprecated
+    public static final byte STREAM_STATUS_NEW_CONNECT = STREAM_STATUS_NEW;
+
+    @Deprecated
+    public static final short EVENT_CIRCSTATUS = EVENT_CIRCUIT_STATUS_INDEX;
+    @Deprecated
+    public static final short EVENT_STREAMSTATUS = EVENT_STREAM_STATUS_INDEX;
+    @Deprecated
+    public static final short EVENT_ORCONNSTATUS = EVENT_OR_CONN_STATUS_INDEX;
+    @Deprecated
+    public static final short EVENT_BANDWIDTH = EVENT_CONN_BW_INDEX;
+    @Deprecated
+    public static final short EVENT_MSG_DEBUG = EVENT_DEBUG_MSG_INDEX;
+    @Deprecated
+    public static final short EVENT_MSG_INFO = EVENT_INFO_MSG_INDEX;
+    @Deprecated
+    public static final short EVENT_MSG_NOTICE = EVENT_NOTICE_MSG_INDEX;
+    @Deprecated
+    public static final short EVENT_MSG_WARN = EVENT_WARN_MSG_INDEX;
+    @Deprecated
+    public static final short EVENT_MSG_ERROR = EVENT_ERR_MSG_INDEX;
 }
