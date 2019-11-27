@@ -529,6 +529,13 @@ public class TorControlConnection implements TorControlCommands {
         }
     }
 
+    /** Tells Tor to exit when this control connection is closed. This command
+     * was added in Tor 0.2.2.28-beta.
+     */
+    public void takeOwnership() throws IOException {
+        sendAndWaitForResponse(TAKEOWNERSHIP + "\r\n", null);
+    }
+
     /** Tells the Tor server that future SOCKS requests for connections to a set of original
      * addresses should be replaced with connections to the specified replacement
      * addresses.  Each element of <b>kvLines</b> is a String of the form
@@ -744,13 +751,6 @@ public class TorControlConnection implements TorControlCommands {
     public void closeCircuit(String circID, boolean ifUnused) throws IOException {
         sendAndWaitForResponse(CLOSECIRCUIT + " " + circID +
                                (ifUnused?" IFUNUSED":"")+"\r\n", null);
-    }
-
-    /** Tells Tor to exit when this control connection is closed. This command
-     * was added in Tor 0.2.2.28-beta.
-     */
-    public void takeOwnership() throws IOException {
-        sendAndWaitForResponse(TAKEOWNERSHIP + "\r\n", null);
     }
 
     /**
