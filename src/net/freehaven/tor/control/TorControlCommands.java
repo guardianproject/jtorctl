@@ -280,10 +280,56 @@ public interface TorControlCommands {
     public static final String OR_CONN_EVENT_CLOSED = "CLOSED";
     public static final String OR_CONN_EVENT_NEW = "NEW";
 
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_RELOAD = "RELOAD";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_SHUTDOWN = "SHUTDOWN";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_DUMP = "DUMP";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_DEBUG = "DEBUG";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_HALT = "HALT";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_NEWNYM = "NEWNYM";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_CLEARDNSCACHE = "CLEARDNSCACHE";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_HEARTBEAT = "HEARTBEAT";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_ACTIVE = "ACTIVE";
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
+     */
+    public static final String SIGNAL_DORMANT = "DORMANT";
+
+    @Deprecated
     public static final byte SIGNAL_HUP = 0x01;
+    @Deprecated
     public static final byte SIGNAL_INT = 0x02;
+    @Deprecated
     public static final byte SIGNAL_USR1 = 0x0A;
+    @Deprecated
     public static final byte SIGNAL_USR2 = 0x0C;
+    @Deprecated
     public static final byte SIGNAL_TERM = 0x0F;
 
     public static final String ERROR_MSGS[] = {

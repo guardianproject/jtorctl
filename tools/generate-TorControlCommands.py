@@ -166,12 +166,30 @@ output += '", "'.join(events)
 output += '"\n    };\n\n'
 for event in events:
     output += '    public static final String OR_CONN_EVENT_%s = "%s";\n' % (event, event)
+output += '\n'
+
+
+signals = []
+with open('../tor/src/feature/control/control.c') as fp:
+    m = re.search(r'const struct signal_name_t signal_table\[]\s*=\s*{\n*([^;]+)};', fp.read(), re.MULTILINE)
+    for name in re.findall(r'\s*{\s*SIG[^ ]+, *"([A-Z0-9_]+)".*', m.group(1)):
+        if name not in ('HUP', 'INT', 'USR1', 'USR2', 'TERM'):
+            output += '    /**\n'
+            output += '     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>\n'
+            output += '     */\n'
+            output += '    public static final String SIGNAL_%s = "%s";\n' % (name, name)
+
 
 output += """
+    @Deprecated
     public static final byte SIGNAL_HUP = 0x01;
+    @Deprecated
     public static final byte SIGNAL_INT = 0x02;
+    @Deprecated
     public static final byte SIGNAL_USR1 = 0x0A;
+    @Deprecated
     public static final byte SIGNAL_USR2 = 0x0C;
+    @Deprecated
     public static final byte SIGNAL_TERM = 0x0F;
 
     public static final String ERROR_MSGS[] = {

@@ -223,41 +223,40 @@ public class TorControlConnection implements TorControlCommands {
             int idx = line.msg.indexOf(' ');
             String tp = line.msg.substring(0, idx).toUpperCase();
             String rest = line.msg.substring(idx+1);
-            if (tp.equals("CIRC")) {
+            if (tp.equals(EVENT_CIRCUIT_STATUS)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.circuitStatus(lst.get(1),
                                       lst.get(0),
-                                      lst.get(1).equals("LAUNCHED")
+                                      lst.get(1).equals(CIRC_EVENT_LAUNCHED)
                                           || lst.size() < 3 ? ""
                                           : lst.get(2));
-            } else if (tp.equals("STREAM")) {
+            } else if (tp.equals(EVENT_STREAM_STATUS)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.streamStatus(lst.get(1),
                                      lst.get(0),
                                      lst.get(3));
                 // XXXX circID.
-            } else if (tp.equals("ORCONN")) {
+            } else if (tp.equals(EVENT_OR_CONN_STATUS)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.orConnStatus(lst.get(1), lst.get(0));
-            } else if (tp.equals("BW")) {
+            } else if (tp.equals(EVENT_BANDWIDTH_USED)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.bandwidthUsed(Integer.parseInt(lst.get(0)),
                                       Integer.parseInt(lst.get(1)));
-            } else if (tp.equals("NEWDESC")) {
+            } else if (tp.equals(EVENT_NEW_DESC)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.newDescriptors(lst);
-            } else if (tp.equals("DEBUG") ||
-                       tp.equals("INFO") ||
-                       tp.equals("NOTICE") ||
-                       tp.equals("WARN") ||
-                       tp.equals("ERR")) {
+            } else if (tp.equals(EVENT_DEBUG_MSG) ||
+                    tp.equals(EVENT_INFO_MSG) ||
+                    tp.equals(EVENT_NOTICE_MSG) ||
+                    tp.equals(EVENT_WARN_MSG) ||
+                    tp.equals(EVENT_ERR_MSG)) {
                 handler.message(tp, rest);
             } else {
                 handler.unrecognized(tp, rest);
             }
         }
     }
-
 
     /**
      * Sets <b>w</b> as the PrintWriter for debugging output,
@@ -571,14 +570,18 @@ public class TorControlConnection implements TorControlCommands {
 
     /**
      * Sends a signal from the controller to the Tor server.
-     * <b>signal</b> is one of the following Strings:
+     * <b>signal</b> is one of the following:
      * <ul>
-     * <li>"RELOAD" or "HUP" :  Reload config items, refetch directory</li>
-     * <li>"SHUTDOWN" or "INT" : Controlled shutdown: if server is an OP, exit immediately.
-     *     If it's an OR, close listeners and exit after 30 seconds</li>
-     * <li>"DUMP" or "USR1" : Dump stats: log information about open connections and circuits</li>
-     * <li>"DEBUG" or "USR2" : Debug: switch all open logs to loglevel debug</li>
-     * <li>"HALT" or "TERM" : Immediate shutdown: clean up and exit now</li>
+     * <li>{@link #SIGNAL_RELOAD}</li>
+     * <li>{@link #SIGNAL_SHUTDOWN}</li>
+     * <li>{@link #SIGNAL_DUMP}</li>
+     * <li>{@link #SIGNAL_DEBUG}</li>
+     * <li>{@link #SIGNAL_HALT}</li>
+     * <li>{@link #SIGNAL_NEWNYM}</li>
+     * <li>{@link #SIGNAL_CLEARDNSCACHE}</li>
+     * <li>{@link #SIGNAL_HEARTBEAT}</li>
+     * <li>{@link #SIGNAL_ACTIVE}</li>
+     * <li>{@link #SIGNAL_DORMANT}</li>
      * </ul>
      *
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#signal">control-spec: SIGNAL</a>
