@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,15 +36,16 @@ public class TorControlConnection implements TorControlCommands {
 
     private ControlParseThread thread; // Locking: this
 
+    private final List<RawEventListener> rawEventListeners = new ArrayList<>(0);
     private volatile EventHandler handler;
     private volatile PrintWriter debugOutput;
     private volatile IOException parseThreadException;
-    
+
     static class Waiter {
-    
+
         List<ReplyLine> response; // Locking: this
         boolean interrupted;
-    
+
         synchronized List<ReplyLine> getResponse() throws InterruptedException {
                 while (response == null) {
                     wait();
@@ -211,18 +213,26 @@ public class TorControlConnection implements TorControlCommands {
     }
 
     /**
-     * Helper: decode a CMD_EVENT command and dispatch it to our
-     * EventHandler (if any).
+     * Dispatch events to all {@link RawEventListener}s.  If the
+     * {@link EventHandler} is set, then decode the event arguments and send
+     * call the {@code EventHandler} methods.
      */
     protected void handleEvent(ArrayList<ReplyLine> events) {
-        if (handler == null)
+        if (handler == null && rawEventListeners.isEmpty()) {
             return;
+        }
 
         for (Iterator<ReplyLine> i = events.iterator(); i.hasNext(); ) {
             ReplyLine line = i.next();
             int idx = line.msg.indexOf(' ');
             String tp = line.msg.substring(0, idx).toUpperCase();
-            String rest = line.msg.substring(idx+1);
+            String rest = line.msg.substring(idx + 1);
+            for (RawEventListener rawEventListener : rawEventListeners) {
+                rawEventListener.onEvent(tp, rest);
+            }
+            if (handler == null) {
+                continue;
+            }
             if (tp.equals(EVENT_CIRCUIT_STATUS)) {
                 List<String> lst = Bytes.splitStr(null, rest);
                 handler.circuitStatus(lst.get(1),
@@ -285,6 +295,24 @@ public class TorControlConnection implements TorControlCommands {
      */
     public void setEventHandler(EventHandler handler) {
         this.handler = handler;
+    }
+
+    /**
+     * Add a {@link RawEventListener} to receive raw events from Tor.
+     *
+     * @see #removeRawEventListener(RawEventListener)
+     */
+    public void addRawEventListener(RawEventListener rawEventListener) {
+        rawEventListeners.add(rawEventListener);
+    }
+
+    /**
+     * Remove a {@link RawEventListener}
+     *
+     * @see #addRawEventListener(RawEventListener)
+     */
+    public void removeRawEventListener(RawEventListener rawEventListener) {
+        rawEventListeners.remove(rawEventListener);
     }
 
     /**
