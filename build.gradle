@@ -7,6 +7,7 @@ exec {
 }
 version = stdout.toString().trim()
 description = 'A Java library for controlling a Tor instance via its control port.'
+group = 'net.freehaven.tor.control'
 
 repositories {
     maven { url 'file:///usr/share/maven-repo' }
@@ -31,5 +32,77 @@ sourceSets {
         java {
             srcDirs = ['test']
         }
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.java.srcDirs
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+apply plugin: 'maven'
+
+task writeNewPom {
+    doLast {
+        pom {
+            project {
+                description project.description
+                inceptionYear '2005'
+                url 'https://gitweb.torproject.org/jtorctl'
+                licenses {
+                    license {
+                        name 'BSD-3-clause'
+                        url 'https://github.com/torproject/jtorctl/blob/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'torproject'
+                        name = 'Tor Project'
+                        email = 'torbrowser@torproject.org'
+                    }
+                    developer {
+                        id = 'freehaven'
+                        name = 'Free Haven Project'
+                        email = 'freehaven@freehaven.net'
+                    }
+                    developer {
+                        id = 'guardianproject'
+                        name = 'Guardian Project'
+                        email = 'support@guardianproject.info'
+                    }
+                    developer {
+                        id = 'briarproject'
+                        name = 'Briar Project'
+                        email = 'contact@briarproject.org'
+                    }
+                }
+                issueManagement {
+                    url = "https://trac.torproject.org"
+                }
+                properties {
+                    maven {
+                        compiler {
+                            source = project.sourceCompatibility.toString()
+                            target = project.targetCompatibility.toString()
+                        }
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://git.torproject.org/jtorctl.git'
+                    url = 'https://gitweb.torproject.org/jtorctl'
+                }
+            }
+        }.writeTo("${project.libsDir}/${project.archivesBaseName}-${project.version}.pom")
     }
 }

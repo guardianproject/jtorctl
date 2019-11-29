@@ -21,7 +21,7 @@ debian_buster:
     - *apt-template
     - apt-get install tor/buster-backports
     - apt-get install default-jdk gradle junit4
-    - gradle build jar javadoc
+    - gradle build jar sourcesJar javadocJar writeNewPom
 
 openjdk-14:
   image: openjdk:14-buster
@@ -30,15 +30,19 @@ openjdk-14:
     - *apt-template
     - apt-get install tor/buster-backports
     - apt-get install gradle
-    - gradle build jar javadoc
+    - gradle build jar sourcesJar javadocJar writeNewPom
 
 openjdk-8:
   image: openjdk:8-stretch
+  artifacts:
+    paths:
+      - build/libs
   script:
     - echo "deb http://deb.debian.org/debian/ stretch-backports-sloppy main" >> /etc/apt/sources.list
     - *apt-template
     - apt-get install tor/stretch-backports-sloppy
-    - ./gradlew build jar javadoc
+    - ./gradlew build jar sourcesJar javadocJar writeNewPom
+    - for f in build/libs/*.jar; do sha256sum $f; done
 
 pages:
   stage: deploy
