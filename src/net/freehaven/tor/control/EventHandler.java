@@ -89,7 +89,9 @@ public interface EventHandler {
 
     /**
      * Invoked when an unspecified message is received.
-     * <type> is the message type, and <msg> is the message string.
+     *
+     * @param type the message type
+     * @param msg  the message string
      */
     public void unrecognized(String type, String msg);
 

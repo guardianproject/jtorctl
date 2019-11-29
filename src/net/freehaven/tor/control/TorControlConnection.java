@@ -271,18 +271,18 @@ public class TorControlConnection implements TorControlCommands {
     /**
      * Sets <b>w</b> as the PrintWriter for debugging output,
      * which writes out all messages passed between Tor and the controller.
-     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
-     * by "\<\<"
+     * Outgoing messages are preceded by "{@code >>} and incoming messages are preceded
+     * by "{@code <<}"
      */
     public void setDebugging(PrintWriter w) {
         debugOutput = w;
     }
 
     /**
-     * Sets <b>s</b> as the PrintStream for debugging output,
+     * Sets <b>s</b> as the {@link PrintStream} for debugging output,
      * which writes out all messages passed between Tor and the controller.
-     * Outgoing messages are preceded by "\>\>" and incoming messages are preceded
-     * by "\<\<"
+     * Outgoing messages are preceded by "{@code >>}" and incoming messages are preceded
+     * by "{@code <<}"
      */
     public void setDebugging(PrintStream s) {
         debugOutput = new PrintWriter(s, true);
@@ -766,7 +766,7 @@ public class TorControlConnection implements TorControlCommands {
      * <ul>
      * <li>"version" : The version of the server's software, including the name
      * of the software. (example: "Tor 0.0.9.4")</li>
-     * <li>"desc/id/<OR identity>" or "desc/name/<OR nickname>" : the latest server
+     * <li>"desc/id/<b>OR identity</b>" or "desc/name/<b>OR nickname</b>" : the latest server
      * descriptor for a given OR, NUL-terminated.  If no such OR is known, the
      * corresponding value is an empty string.</li>
      * <li>"network-status" : a space-separated list of all known OR identities.
@@ -1171,7 +1171,7 @@ public class TorControlConnection implements TorControlCommands {
     /**
      * Tells Tor to generate and set up a new onion service using the best
      * supported algorithm.
-     * <p/>
+     * <p>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
      *
      * @see #addOnion(Map, boolean, boolean)
@@ -1189,7 +1189,7 @@ public class TorControlConnection implements TorControlCommands {
     /**
      * Tells Tor to generate and set up a new onion service using the best
      * supported algorithm.
-     * <p/>
+     * <p>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
      *
      * @see #addOnion(Map)
@@ -1207,7 +1207,7 @@ public class TorControlConnection implements TorControlCommands {
 
     /**
      * Tells Tor to set up an onion service using the provided private key.
-     * <p/>
+     * <p>
      * ADD_ONION was added in Tor 0.2.7.1-alpha.
      *
      * @see #addOnion(Map)
@@ -1296,7 +1296,7 @@ public class TorControlConnection implements TorControlCommands {
     /**
      * Tells Tor to take down an onion service previously set up with
      * addOnion(). The hostname excludes the .onion extension.
-     * <p/>
+     * <p>
      * DEL_ONION was added in Tor 0.2.7.1-alpha.
      *
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#del_onion">control-spec: DEL_ONION</a>
