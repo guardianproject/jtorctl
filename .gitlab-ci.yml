@@ -21,7 +21,7 @@ debian_buster:
     - *apt-template
     - apt-get install tor/buster-backports
     - apt-get install default-jdk gradle junit4
-    - gradle build jar
+    - gradle build jar javadoc
 
 openjdk-14:
   image: openjdk:14-buster
@@ -30,7 +30,7 @@ openjdk-14:
     - *apt-template
     - apt-get install tor/buster-backports
     - apt-get install gradle
-    - gradle build jar
+    - gradle build jar javadoc
 
 openjdk-8:
   image: openjdk:8-stretch
@@ -38,4 +38,15 @@ openjdk-8:
     - echo "deb http://deb.debian.org/debian/ stretch-backports-sloppy main" >> /etc/apt/sources.list
     - *apt-template
     - apt-get install tor/stretch-backports-sloppy
-    - ./gradlew build jar
+    - ./gradlew build jar javadoc
+
+pages:
+  stage: deploy
+  image: openjdk:8-stretch
+  artifacts:
+    paths:
+      - public
+  script:
+    - ./gradlew javadoc
+    - test -d public || mkdir public
+    - mv build/docs/javadoc/* public/
