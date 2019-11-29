@@ -1,0 +1,41 @@
+
+.apt-template: &apt-template
+- export LC_ALL=C.UTF-8
+- export DEBIAN_FRONTEND=noninteractive
+- echo Etc/UTC > /etc/timezone
+- echo 'quiet "1";'
+       'APT::Install-Recommends "0";'
+       'APT::Install-Suggests "0";'
+       'APT::Acquire::Retries "20";'
+       'APT::Get::Assume-Yes "true";'
+       'Dpkg::Use-Pty "0";'
+      > /etc/apt/apt.conf.d/99gitlab
+- apt-get update
+- apt-get dist-upgrade
+- apt-get install git
+
+debian_buster:
+  image: debian:buster
+  script:
+    - echo "deb http://deb.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list
+    - *apt-template
+    - apt-get install tor/buster-backports
+    - apt-get install default-jdk gradle junit4
+    - gradle build jar
+
+openjdk-14:
+  image: openjdk:14-buster
+  script:
+    - echo "deb http://deb.debian.org/debian/ buster-backports main" >> /etc/apt/sources.list
+    - *apt-template
+    - apt-get install tor/buster-backports
+    - apt-get install gradle
+    - gradle build jar
+
+openjdk-8:
+  image: openjdk:8-stretch
+  script:
+    - echo "deb http://deb.debian.org/debian/ stretch-backports-sloppy main" >> /etc/apt/sources.list
+    - *apt-template
+    - apt-get install tor/stretch-backports-sloppy
+    - ./gradlew build jar

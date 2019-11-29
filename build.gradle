@@ -14,6 +14,9 @@ repositories {
 }
 
 dependencies {
+    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation 'org.json:json:20190722'
+    testImplementation 'junit:junit:4.12'
 }
 
 
