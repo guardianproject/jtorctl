@@ -481,6 +481,20 @@ public class TorControlConnection implements TorControlCommands {
     }
 
     /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#loadconf">control-spec: LOADCONF</a>
+     */
+    public void loadConf(String[] configLines) throws IOException {
+        sendAndWaitForResponse(LOADCONF + "\r\n", String.join("\n", configLines));
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#loadconf">control-spec: LOADCONF</a>
+     */
+    public void loadConf(String config) throws IOException {
+        sendAndWaitForResponse(LOADCONF + "\r\n", config);
+    }
+
+    /**
      * Request that the server inform the client about interesting events.
      * Each element of <b>events</b> is one of the following Strings:
      * <ul>
@@ -569,6 +583,15 @@ public class TorControlConnection implements TorControlCommands {
     }
 
     /**
+     * Instructs the server to write out its configuration options into its torrc.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#saveconf">control-spec: SAVECONF</a>
+     */
+    public void saveConfForce() throws IOException {
+        sendAndWaitForResponse(SAVECONF + " FORCE\r\n", null);
+    }
+
+    /**
      * Sends a signal from the controller to the Tor server.
      * <b>signal</b> is one of the following:
      * <ul>
@@ -617,6 +640,14 @@ public class TorControlConnection implements TorControlCommands {
      */
     public void takeOwnership() throws IOException {
         sendAndWaitForResponse(TAKEOWNERSHIP + "\r\n", null);
+    }
+
+    /**
+     * @see #takeOwnership()
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#dropownership">control-spec: DROPOWNERSHIP</a>
+     */
+    public void dropOwnership() throws IOException {
+        sendAndWaitForResponse(DROPOWNERSHIP + "\r\n", null);
     }
 
     /**
@@ -783,6 +814,21 @@ public class TorControlConnection implements TorControlCommands {
     }
 
     /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setcircuitpurpose">control-spec: SETCIRCUITPURPOSE</a>
+     */
+    public void setCircuitPurpose(String circuitID, String purpose) throws IOException {
+        sendAndWaitForResponse(SETCIRCUITPURPOSE + " " + circuitID + " " + purpose + "\r\n", null);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setrouterpurpose">control-spec: SETROUTERPURPOSE</a>
+     */
+    @Deprecated
+    public void setRouterPurpose(String nicknameOrKey, String purpose) throws IOException {
+        sendAndWaitForResponse(SETROUTERPURPOSE + " " + nicknameOrKey + " " + purpose + "\r\n", null);
+    }
+
+    /**
      * Informs the Tor server that the stream specified by <b>streamID</b> should be
      * associated with the circuit specified by <b>circID</b>.
      * <p>
@@ -804,7 +850,7 @@ public class TorControlConnection implements TorControlCommands {
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#attachstream">control-spec: ATTACHSTREAM</a>
      */
     public void attachStream(String streamID, String circID)
-        throws IOException {
+            throws IOException {
         sendAndWaitForResponse(ATTACHSTREAM + " " + streamID + " " + circID + "\r\n", null);
     }
 
@@ -813,14 +859,57 @@ public class TorControlConnection implements TorControlCommands {
      * <p>
      * The descriptor, when parsed, must contain a number of well-specified
      * fields, including fields for its nickname and identity.
-     * <p>
-     * TODO More documentation here on format of desc?
-     * No need for return value?  control-spec.txt says reply is merely "250 OK" on success...
      *
+     * @see #postDescriptor(String, String)
+     * @see #postDescriptor(boolean, String)
+     * @see #postDescriptor(String, boolean, String)
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#postdescriptor">control-spec: POSTDESCRIPTOR</a>
      */
     public String postDescriptor(String desc) throws IOException {
         List<ReplyLine> lst = sendAndWaitForResponse(POSTDESCRIPTOR + "\r\n", desc);
+        return (lst.get(0)).msg;
+    }
+
+    /**
+     * @see #postDescriptor(String)
+     * @see #postDescriptor(boolean, String)
+     * @see #postDescriptor(String, boolean, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#postdescriptor">control-spec: POSTDESCRIPTOR</a>
+     */
+    public String postDescriptor(String purpose, String descriptor) throws IOException {
+        purpose = "purpose=" + purpose;
+        List<ReplyLine> lst = sendAndWaitForResponse(POSTDESCRIPTOR + " " + purpose + "\r\n", descriptor);
+        return (lst.get(0)).msg;
+    }
+
+    /**
+     * @see #postDescriptor(String)
+     * @see #postDescriptor(String, String)
+     * @see #postDescriptor(String, boolean, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#postdescriptor">control-spec: POSTDESCRIPTOR</a>
+     */
+    public String postDescriptor(boolean cache, String descriptor) throws IOException {
+        return postDescriptor(null, cache, descriptor);
+    }
+
+    /**
+     * @see #postDescriptor(String)
+     * @see #postDescriptor(String, String)
+     * @see #postDescriptor(boolean, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#postdescriptor">control-spec: POSTDESCRIPTOR</a>
+     */
+    public String postDescriptor(String purpose, boolean cache, String descriptor) throws IOException {
+        if (purpose == null || purpose.length() < 1) {
+            purpose = "";
+        } else {
+            purpose = "purpose=" + purpose;
+        }
+        List<ReplyLine> lst;
+        if (cache) {
+            lst = sendAndWaitForResponse(POSTDESCRIPTOR + " " + purpose + " cache=yes \r\n", descriptor);
+        } else {
+            lst = sendAndWaitForResponse(POSTDESCRIPTOR + " " + purpose + " cache=no \r\n", descriptor);
+        }
         return (lst.get(0)).msg;
     }
 
@@ -875,6 +964,174 @@ public class TorControlConnection implements TorControlCommands {
     public void closeCircuit(String circID, boolean ifUnused) throws IOException {
         sendAndWaitForResponse(CLOSECIRCUIT + " " + circID +
                                (ifUnused?" IFUNUSED":"")+"\r\n", null);
+    }
+
+    /**
+     * @see #useFeature(Collection)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#usefeature">control-spec: USEFEATURE</a>
+     */
+    public void useFeature(String key) throws IOException {
+        sendAndWaitForResponse(USEFEATURE + " " + key + "\r\n", null);
+    }
+
+    /**
+     * @see #useFeature(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#usefeature">control-spec: USEFEATURE</a>
+     */
+    public void useFeature(Collection<String> keys) throws IOException {
+        if (keys.size() == 0) {
+            return;
+        }
+        StringBuffer b = new StringBuffer(USEFEATURE);
+        for (String key : keys) {
+            b.append(" ").append(key);
+        }
+        b.append("\r\n");
+        sendAndWaitForResponse(b.toString(), null);
+    }
+
+    /**
+     * @see #resolve(String, boolean)
+     * @see #resolve(String, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#resolve">control-spec: RESOLVE</a>
+     */
+    public void resolve(String hostname) throws IOException {
+        resolve(hostname, false);
+    }
+
+    /**
+     * @see #resolve(String)
+     * @see #resolve(String, String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#resolve">control-spec: RESOLVE</a>
+     */
+    public void resolve(String hostname, boolean reverseLookup) throws IOException {
+        if (reverseLookup) {
+            resolve("mode=reverse", hostname);
+        } else {
+            sendAndWaitForResponse(RESOLVE + " " + hostname + "\r\n", null);
+        }
+    }
+
+    /**
+     * @see #resolve(String)
+     * @see #resolve(String, boolean)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#resolve">control-spec: RESOLVE</a>
+     */
+    public void resolve(String option, String address) throws IOException {
+        sendAndWaitForResponse(RESOLVE + " " + option + " " + address + "\r\n", null);
+    }
+
+    /**
+     * @see #protocolInfo(Collection)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#protocolinfo">control-spec: PROTOCOLINFO</a>
+     */
+    public void protocolInfo(String key) throws IOException {
+        sendAndWaitForResponse(PROTOCOLINFO + " " + key + "\r\n", null);
+    }
+
+    /**
+     * @see #protocolInfo(String)
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#protocolinfo">control-spec: PROTOCOLINFO</a>
+     */
+    public void protocolInfo(Collection<String> keys) throws IOException {
+        if (keys.size() == 0) {
+            return;
+        }
+        StringBuffer b = new StringBuffer(PROTOCOLINFO);
+        for (String key : keys) {
+            b.append(" ").append(key);
+        }
+        b.append("\r\n");
+        sendAndWaitForResponse(b.toString(), null);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#authchallenge">control-spec: AUTHCHALLENGE</a>
+     */
+    public Map<String, String> authChallenge(String clientNonce) throws IOException {
+        List<ReplyLine> lst = sendAndWaitForResponse(AUTHCHALLENGE + " SAFECOOKIE " + clientNonce + "\r\n", null);
+        Map<String, String> ret = new HashMap<String, String>();
+        for (ReplyLine line : lst) {
+            String[] items = line.msg.split("=", 2);
+            ret.put(items[0], items[1]);
+        }
+        return ret;
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#dropguards">control-spec: DROPGUARDS</a>
+     */
+    public void dropGuards() throws IOException {
+        sendAndWaitForResponse(DROPGUARDS + "\r\n", null);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hsfetch">control-spec: HSFETCH</a>
+     */
+    public void hsFetch(String address) throws IOException {
+        sendAndWaitForResponse(HSFETCH + " " + address + "\r\n", null);
+    }
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hsfetch">control-spec: HSFETCH</a>
+     */
+    public void hsFetch(String address, String server) throws IOException {
+        hsFetch(address, Collections.singletonList(server));
+    }
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hsfetch">control-spec: HSFETCH</a>
+     */
+    public void hsFetch(String address, List<String> servers) throws IOException {
+        StringBuffer b = new StringBuffer(HSFETCH);
+        b.append(' ').append(address);
+        if (servers != null) {
+            for (String server : servers) {
+                if (server != null && server.length() > 0) {
+                    b.append(" SERVER=").append(server);
+                }
+            }
+        }
+        b.append("\r\n");
+        sendAndWaitForResponse(b.toString(), null);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hspost">control-spec: HSPOST</a>
+     */
+    public void hsPost(String descriptor) throws IOException {
+        hsPost(null, null, descriptor);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hspost">control-spec: HSPOST</a>
+     */
+    public void hsPost(String server, String descriptor) throws IOException {
+        hsPost(Collections.singletonList(server), null, descriptor);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hspost">control-spec: HSPOST</a>
+     */
+    public void hsPost(List<String> servers, String descriptor) throws IOException {
+        hsPost(servers, null, descriptor);
+    }
+
+    /**
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hspost">control-spec: HSPOST</a>
+     */
+    public void hsPost(List<String> servers, String hsAddress, String descriptor) throws IOException {
+        StringBuffer b = new StringBuffer(HSPOST);
+        if (servers != null) {
+            for (String server : servers) {
+                if (server != null && server.length() > 0) {
+                    b.append(" SERVER=").append(server);
+                }
+            }
+        }
+        if (hsAddress != null && hsAddress.length() > 0) {
+            b.append(" HSADDRESS=").append(hsAddress);
+        }
+        b.append("\r\n");
+        sendAndWaitForResponse(b.toString(), descriptor);
     }
 
     /**
