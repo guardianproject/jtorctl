@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.torproject</groupId>
+  <artifactId>jtorctl</artifactId>
+  <version>0.3.1-SNAPSHOT</version>
+
+  <url>https://github.com/torproject/jtorctl</url>
+  <description>A Java library for controlling a Tor instance via its control port.</description>
+
+  <licenses>
+   <license>
+     <name>BSD-3-clause</name>
+     <url>https://github.com/torproject/jtorctl/blob/master/LICENSE</url>
+   </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>torproject</id>
+      <name>Tor Project</name>
+      <email>torbrowser@torproject.org</email>
+    </developer>
+    <developer>
+      <id>freehaven</id>
+      <name>Free Haven Project</name>
+      <email>freehaven@freehaven.net</email>
+    </developer>
+    <developer>
+      <id>guardianproject</id>
+      <name>Guardian Project</name>
+      <email>support@guardianproject.info</email>
+    </developer>
+    <developer>
+      <id>briarproject</id>
+      <name>Briar Project</name>
+      <email>contact@briarproject.org</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:https://github.com/torproject/jtorctl.git</connection>
+    <developerConnection>scm:git@github.com:torproject/jtorctl.git</developerConnection>
+    <url>scm:https://github.com/torproject/jtorctl</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.outputTimestamp>2019-10-02T08:04:00Z</project.build.outputTimestamp>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20190722</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

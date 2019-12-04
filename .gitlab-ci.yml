@@ -44,6 +44,18 @@ openjdk-8:
     - ./gradlew build jar sourcesJar javadocJar writeNewPom
     - for f in build/libs/*.jar; do sha256sum $f; done
 
+openjdk-8_maven:
+  image: openjdk:8-stretch
+  artifacts:
+    paths:
+      - target/jtorctl-*.*
+  script:
+    - echo "deb http://deb.debian.org/debian/ stretch-backports-sloppy main" >> /etc/apt/sources.list
+    - *apt-template
+    - apt-get install maven tor/stretch-backports-sloppy
+    - mvn verify
+    - for f in target/*.jar; do sha256sum $f; done
+
 pages:
   stage: deploy
   image: openjdk:8-stretch
