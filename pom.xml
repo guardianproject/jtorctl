@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.torproject</groupId>
+  <groupId>net.freehaven.tor.control</groupId>
   <artifactId>jtorctl</artifactId>
   <version>0.3.1-SNAPSHOT</version>
-
-  <url>https://github.com/torproject/jtorctl</url>
   <description>A Java library for controlling a Tor instance via its control port.</description>
-
+  <url>https://gitweb.torproject.org/jtorctl</url>
+  <inceptionYear>2005</inceptionYear>
   <licenses>
-   <license>
-     <name>BSD-3-clause</name>
-     <url>https://github.com/torproject/jtorctl/blob/master/LICENSE</url>
-   </license>
+    <license>
+      <name>BSD-3-clause</name>
+      <url>https://github.com/torproject/jtorctl/blob/master/LICENSE</url>
+    </license>
   </licenses>
-
   <developers>
     <developer>
       <id>torproject</id>
@@ -39,34 +37,37 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:https://github.com/torproject/jtorctl.git</connection>
-    <developerConnection>scm:git@github.com:torproject/jtorctl.git</developerConnection>
-    <url>scm:https://github.com/torproject/jtorctl</url>
+    <connection>scm:git:https://git.torproject.org/jtorctl.git</connection>
+    <url>https://gitweb.torproject.org/jtorctl</url>
   </scm>
-
+  <issueManagement>
+    <url>https://trac.torproject.org</url>
+  </issueManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.outputTimestamp>2019-10-02T08:04:00Z</project.build.outputTimestamp>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.6</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20190722</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -82,5 +83,29 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-buildinfo-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>save</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
