@@ -9,6 +9,9 @@ version = stdout.toString().trim()
 description = 'A Java library for controlling a Tor instance via its control port.'
 group = 'net.freehaven.tor.control'
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 repositories {
     maven { url 'file:///usr/share/maven-repo' }
     mavenCentral()
