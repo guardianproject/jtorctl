@@ -38,6 +38,16 @@ sourceSets {
     }
 }
 
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+tasks.withType(Javadoc) {
+    options.noTimestamp = true
+    options.addStringOption('charset', 'UTF-8') // to match Maven's case
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.java.srcDirs
