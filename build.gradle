@@ -6,6 +6,14 @@ exec {
     standardOutput = stdout
 }
 version = stdout.toString().trim()
+
+stdout = new ByteArrayOutputStream()
+exec {
+    commandLine 'git', 'rev-parse', 'HEAD'
+    standardOutput = stdout
+}
+ext.commitId = stdout.toString().trim()
+
 description = 'A Java library for controlling a Tor instance via its control port.'
 group = 'net.freehaven.tor.control'
 
@@ -64,6 +72,52 @@ artifacts {
 }
 
 apply plugin: 'maven'
+
+// https://reproducible-builds.org/docs/jvm/
+task buildInfo {
+    doLast {
+        Properties p = new Properties()
+        p.setProperty('buildinfo.version', '0.1')
+        p.setProperty('name', project.name)
+        p.setProperty('version', project.version)
+        p.setProperty('build-timestamp', System.currentTimeMillis().toString())
+        p.setProperty('group-id', project.group)
+        p.setProperty('artifact-id', project.name)
+        p.setProperty('build-tool', 'gradle')
+        p.setProperty('java.version', System.properties['java.version'])
+        p.setProperty('java.vendor', System.properties['java.vendor'])
+        p.setProperty('java.vm.version', System.properties['java.vm.version'])
+        p.setProperty('java.specification.version', System.properties['java.specification.version'])
+        p.setProperty('os.name', System.properties['os.name'])
+        p.setProperty('os.arch', System.properties['os.arch'])
+        p.setProperty('os.version', System.properties['os.version'])
+        //p.setProperty('source.used', '')
+        //p.setProperty('source.artifact', '<groupId>:<artifactId>:<version>:<classifier>:<extension>')
+        //p.setProperty('source.url', '<url where to download official source tarball>')
+        p.setProperty('source.scm.uri', 'https://github.com/eighthave/jtorctl.git')
+        p.setProperty('source.scm.tag', project.version)
+        p.setProperty('source.scm.commit-id', project.ext.commitId)
+
+        def gradleTaskNames = ''
+        for (task in gradle.taskGraph.getAllTasks().reverse()) {
+            gradleTaskNames = "${task.name} $gradleTaskNames".strip()
+        }
+        p.setProperty('gradle.tasks', gradleTaskNames)
+        p.setProperty('gradle.version', gradle.gradleVersion)
+
+        int i = 0
+        tasks.withType(AbstractArchiveTask) { task ->
+            p.setProperty('output.' + i + '.filename', task.archiveName)
+            def f = file("${task.destinationDir}/${task.archiveName}")
+            p.setProperty('output.' + i + '.length', f.size().toString())
+            p.setProperty('output.' + i + '.sha256',
+                    java.security.MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString())
+            i++
+        }
+        def buildInfoFile = file("${project.libsDir}/${project.archivesBaseName}-${project.version}.buildinfo")
+        p.store(new FileWriter(buildInfoFile), null)
+    }
+}
 
 task writeNewPom {
     doLast {
