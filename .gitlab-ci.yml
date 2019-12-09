@@ -66,3 +66,10 @@ pages:
     - ./gradlew javadoc
     - test -d public || mkdir public
     - mv build/docs/javadoc/* public/
+
+    - *apt-template
+    - apt-get install maven
+    - sed -i "s,CI_PROJECT_ID,${CI_PROJECT_ID},g" pom.xml
+    - mvn versions:set -DnewVersion=$(git describe --tags --always)
+    - mvn deploy -s .gitlab/mvn_settings.xml
+    - for f in target/*.jar; do sha256sum $f; done
