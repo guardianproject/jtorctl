@@ -48,7 +48,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <project.build.outputTimestamp>2019-10-02T08:04:00Z</project.build.outputTimestamp>
+    <!-- this is the date gradle uses when preserveFileTimestamps = false -->
+    <project.build.outputTimestamp>1980-02-01T00:00:00Z</project.build.outputTimestamp>
   </properties>
   <dependencies>
     <dependency>
@@ -92,19 +93,31 @@
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+	<configuration>
+	  <archive>
+	    <addMavenDescriptor>false</addMavenDescriptor>
+	    <manifest>
+	      <addDefaultEntries>false</addDefaultEntries>
+	    </manifest>
+	  </archive>
+	</configuration>
+      </plugin>
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-source-plugin</artifactId>
+	<configuration>
+	  <archive>
+	    <addMavenDescriptor>false</addMavenDescriptor>
+	    <manifest>
+	      <addDefaultEntries>false</addDefaultEntries>
+	    </manifest>
+	  </archive>
+	</configuration>
 	<executions>
 	  <execution>
 	    <id>attach-sources</id>
@@ -117,6 +130,12 @@
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-javadoc-plugin</artifactId>
+	<configuration>
+	  <notimestamp>true</notimestamp>
+	  <archive>
+	    <addMavenDescriptor>false</addMavenDescriptor>
+	  </archive>
+	</configuration>
 	<executions>
 	  <execution>
 	    <id>attach-javadocs</id>

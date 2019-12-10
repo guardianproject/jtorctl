@@ -13,4 +13,7 @@ local.properties
 /.idea/
 *.iml
 
+# Maven
+pom.xml.versionsBackup
+/target/
 
