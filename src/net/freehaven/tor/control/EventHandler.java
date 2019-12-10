@@ -8,6 +8,7 @@ package net.freehaven.tor.control;
  * @see TorControlConnection#setEventHandler
  * @see TorControlConnection#setEvents
  */
+@Deprecated
 public interface EventHandler {
     /**
      * Invoked when a circuit's status has changed.

@@ -292,7 +292,13 @@ public class TorControlConnection implements TorControlCommands {
      * Set the EventHandler object that will be notified of any
      * events Tor delivers to this connection.  To make Tor send us
      * events, call setEvents().
+     *
+     * @see EventListener
+     * @see RawEventListener
+     * @see #addRawEventListener(RawEventListener)
+     * @see #removeRawEventListener(RawEventListener)
      */
+    @Deprecated
     public void setEventHandler(EventHandler handler) {
         this.handler = handler;
     }
