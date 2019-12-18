@@ -10,6 +10,11 @@ with open('src/net/freehaven/tor/control/TorControlCommands.java') as fp:
     output = re.split(GENERATED, fp.read())[0]
 output += GENERATED
 
+output += '\n    public static final String GENERATED_FROM_TOR_VERSION = "'
+with open('../tor/configure.ac') as fp:
+    output += re.search(r' *AC_INIT\(\[tor\],\[([0-9a-zA-Z.-]+)\]\)', fp.read()).group(1)
+output += '";\n\n'
+
 camelCased = {
     'SETCONF': 'setConf',
     'RESETCONF': 'resetConf',
