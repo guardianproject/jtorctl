@@ -74,6 +74,10 @@
 
   <repositories>
     <repository>
+      <id>debian</id>
+      <url>file:///usr/share/maven-repo</url>
+    </repository>
+    <repository>
       <id>gitlab-maven</id>
       <url>https://gitlab.com/api/v4/projects/CI_PROJECT_ID/packages/maven</url>
     </repository>
@@ -161,6 +165,10 @@
   </build>
 
   <pluginRepositories>
+    <pluginRepository>
+      <id>debian</id>
+      <url>file:///usr/share/maven-repo</url>
+    </pluginRepository>
     <pluginRepository>
       <id>apache.snapshots</id>
       <url>https://repository.apache.org/content/repositories/snapshots/</url>
