@@ -2,9 +2,9 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.freehaven.tor.control</groupId>
+  <groupId>info.guardianproject</groupId>
   <artifactId>jtorctl</artifactId>
-  <version>0.3.1-SNAPSHOT</version>
+  <version>0.4.2.5</version>
   <description>A Java library for controlling a Tor instance via its control port.</description>
   <url>https://gitweb.torproject.org/jtorctl</url>
   <inceptionYear>2005</inceptionYear>
@@ -37,8 +37,8 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://git.torproject.org/jtorctl.git</connection>
-    <url>https://gitweb.torproject.org/jtorctl</url>
+    <connection>scm:git:https://github.com/guardianproject/jtorctl.git</connection>
+    <url>https://github.com/guardianproject/jtorctl</url>
   </scm>
   <issueManagement>
     <url>https://trac.torproject.org</url>

@@ -9,7 +9,7 @@ It is available on Maven Central, and can be used as maven/gradle
 library, e.g.:
 
 ```
-    implementation 'net.freehaven.tor.control:jtorctl:0.2'
+    implementation info.guardianproject:jtorctl:0.4.2.5'
 ```
 
 ## Updating
