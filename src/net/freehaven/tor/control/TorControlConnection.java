@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -225,8 +226,16 @@ public class TorControlConnection implements TorControlCommands {
         for (Iterator<ReplyLine> i = events.iterator(); i.hasNext(); ) {
             ReplyLine line = i.next();
             int idx = line.msg.indexOf(' ');
-            String tp = line.msg.substring(0, idx).toUpperCase();
-            String rest = line.msg.substring(idx + 1);
+            String tp;
+            String rest;
+            try {
+                tp = line.msg.substring(0, idx).toUpperCase();
+                rest = line.msg.substring(idx + 1);
+            } catch (StringIndexOutOfBoundsException ex) {
+                throw new UnsupportedOperationException(
+                        "Event listened for is not yet implemented" , ex
+                );
+            }
             for (RawEventListener rawEventListener : rawEventListeners) {
                 rawEventListener.onEvent(tp, rest);
             }
