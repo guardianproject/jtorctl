@@ -219,7 +219,7 @@ public class TorControlConnection implements TorControlCommands {
      * {@link EventHandler} is set, then decode the event arguments and send
      * call the {@code EventHandler} methods.
      */
-    protected void handleEvent(ArrayList<ReplyLine> events) {
+    protected void handleEvent(ArrayList<ReplyLine> events) throws UnsupportedOperationException {
         if (handler == null && rawEventListeners.isEmpty()) {
             return;
         }
@@ -577,7 +577,7 @@ public class TorControlConnection implements TorControlCommands {
      *
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setevents">control-spec: SETEVENTS</a>
      */
-    public void setEvents(List<String> events) throws IOException {
+    public void setEvents(List<String> events) throws IOException, IllegalArgumentException {
         StringBuffer sb = new StringBuffer(SETEVENTS);
         String supportedEvents = Arrays.toString(EVENT_NAMES);
         for (Iterator<String> it = events.iterator(); it.hasNext(); ) {
