@@ -32,7 +32,6 @@ public interface RawEventListener {
      * <li>{@link TorControlCommands#EVENT_GUARD}</li>
      * <li>{@link TorControlCommands#EVENT_STREAM_BANDWIDTH_USED}</li>
      * <li>{@link TorControlCommands#EVENT_CLIENTS_SEEN}</li>
-     * <li>{@link TorControlCommands#EVENT_NEWCONSENSUS}</li>
      * <li>{@link TorControlCommands#EVENT_BUILDTIMEOUT_SET}</li>
      * <li>{@link TorControlCommands#EVENT_GOT_SIGNAL}</li>
      * <li>{@link TorControlCommands#EVENT_CONF_CHANGED}</li>
@@ -41,7 +40,6 @@ public interface RawEventListener {
      * <li>{@link TorControlCommands#EVENT_CIRC_BANDWIDTH_USED}</li>
      * <li>{@link TorControlCommands#EVENT_TRANSPORT_LAUNCHED}</li>
      * <li>{@link TorControlCommands#EVENT_HS_DESC}</li>
-     * <li>{@link TorControlCommands#EVENT_HS_DESC_CONTENT}</li>
      * <li>{@link TorControlCommands#EVENT_NETWORK_LIVENESS}</li>
      * </ul>
      *
