@@ -29,6 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TorControlConnectionTest {
 
@@ -127,6 +128,14 @@ public class TorControlConnectionTest {
         torControlConnection.launchThread(true);
         torControlConnection.authenticate(new byte[0]);
         torControlConnection.setEventHandler(eventHandler);
+
+        try {
+            torControlConnection.setEvents(Arrays.asList(
+                    "NEWCONSENSUS", TorControlCommands.EVENT_CONN_BW
+            ));
+            fail();
+        } catch (IllegalArgumentException ignored) {}
+
         torControlConnection.setEvents(Arrays.asList(
                 TorControlCommands.EVENT_OR_CONN_STATUS,
                 TorControlCommands.EVENT_CIRCUIT_STATUS,
