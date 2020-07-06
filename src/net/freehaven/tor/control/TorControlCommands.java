@@ -170,7 +170,7 @@ public interface TorControlCommands {
         "GUARD",
         "STREAM_BW",
         "CLIENTS_SEEN",
-        "NEWCONSENSUS",
+//        "NEWCONSENSUS",
         "BUILDTIMEOUT_SET",
         "SIGNAL",
         "CONF_CHANGED",
@@ -179,7 +179,7 @@ public interface TorControlCommands {
         "CIRC_BW",
         "TRANSPORT_LAUNCHED",
         "HS_DESC",
-        "HS_DESC_CONTENT",
+//        "HS_DESC_CONTENT",
         "NETWORK_LIVENESS"
     };
 
@@ -203,7 +203,7 @@ public interface TorControlCommands {
     public static final String EVENT_GUARD = "GUARD";
     public static final String EVENT_STREAM_BANDWIDTH_USED = "STREAM_BW";
     public static final String EVENT_CLIENTS_SEEN = "CLIENTS_SEEN";
-    public static final String EVENT_NEWCONSENSUS = "NEWCONSENSUS";
+//    public static final String EVENT_NEWCONSENSUS = "NEWCONSENSUS";
     public static final String EVENT_BUILDTIMEOUT_SET = "BUILDTIMEOUT_SET";
     public static final String EVENT_GOT_SIGNAL = "SIGNAL";
     public static final String EVENT_CONF_CHANGED = "CONF_CHANGED";
@@ -212,7 +212,7 @@ public interface TorControlCommands {
     public static final String EVENT_CIRC_BANDWIDTH_USED = "CIRC_BW";
     public static final String EVENT_TRANSPORT_LAUNCHED = "TRANSPORT_LAUNCHED";
     public static final String EVENT_HS_DESC = "HS_DESC";
-    public static final String EVENT_HS_DESC_CONTENT = "HS_DESC_CONTENT";
+//    public static final String EVENT_HS_DESC_CONTENT = "HS_DESC_CONTENT";
     public static final String EVENT_NETWORK_LIVENESS = "NETWORK_LIVENESS";
 
     public static final byte CIRC_STATUS_LAUNCHED = 0x01;

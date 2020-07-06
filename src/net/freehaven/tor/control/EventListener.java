@@ -32,7 +32,6 @@ public abstract class EventListener implements RawEventListener {
      * <li>{@link TorControlCommands#EVENT_GUARD}</li>
      * <li>{@link TorControlCommands#EVENT_STREAM_BANDWIDTH_USED}</li>
      * <li>{@link TorControlCommands#EVENT_CLIENTS_SEEN}</li>
-     * <li>{@link TorControlCommands#EVENT_NEWCONSENSUS}</li>
      * <li>{@link TorControlCommands#EVENT_BUILDTIMEOUT_SET}</li>
      * <li>{@link TorControlCommands#EVENT_GOT_SIGNAL}</li>
      * <li>{@link TorControlCommands#EVENT_CONF_CHANGED}</li>
@@ -41,7 +40,6 @@ public abstract class EventListener implements RawEventListener {
      * <li>{@link TorControlCommands#EVENT_CIRC_BANDWIDTH_USED}</li>
      * <li>{@link TorControlCommands#EVENT_TRANSPORT_LAUNCHED}</li>
      * <li>{@link TorControlCommands#EVENT_HS_DESC}</li>
-     * <li>{@link TorControlCommands#EVENT_HS_DESC_CONTENT}</li>
      * <li>{@link TorControlCommands#EVENT_NETWORK_LIVENESS}</li>
      * </ul>
      *
@@ -109,9 +107,9 @@ public abstract class EventListener implements RawEventListener {
             case TorControlCommands.EVENT_CLIENTS_SEEN:
                 clientsSeen(data);
                 break;
-            case TorControlCommands.EVENT_NEWCONSENSUS:
-                newConsensus(data);
-                break;
+//            case TorControlCommands.EVENT_NEWCONSENSUS:
+//                newConsensus(data);
+//                break;
             case TorControlCommands.EVENT_BUILDTIMEOUT_SET:
                 buildTimeoutSet(data);
                 break;
@@ -136,9 +134,9 @@ public abstract class EventListener implements RawEventListener {
             case TorControlCommands.EVENT_HS_DESC:
                 hsDesc(data);
                 break;
-            case TorControlCommands.EVENT_HS_DESC_CONTENT:
-                hsDescContent(data);
-                break;
+//            case TorControlCommands.EVENT_HS_DESC_CONTENT:
+//                hsDescContent(data);
+//                break;
             case TorControlCommands.EVENT_NETWORK_LIVENESS:
                 networkLiveness(data);
                 break;
@@ -187,7 +185,7 @@ public abstract class EventListener implements RawEventListener {
 
     public abstract void clientsSeen(String data);
 
-    public abstract void newConsensus(String data);
+//    public abstract void newConsensus(String data);
 
     public abstract void buildTimeoutSet(String data);
 
@@ -205,7 +203,7 @@ public abstract class EventListener implements RawEventListener {
 
     public abstract void hsDesc(String data);
 
-    public abstract void hsDescContent(String data);
+//    public abstract void hsDescContent(String data);
 
     public abstract void networkLiveness(String data);
 

@@ -13,7 +13,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -217,7 +219,7 @@ public class TorControlConnection implements TorControlCommands {
      * {@link EventHandler} is set, then decode the event arguments and send
      * call the {@code EventHandler} methods.
      */
-    protected void handleEvent(ArrayList<ReplyLine> events) {
+    protected void handleEvent(ArrayList<ReplyLine> events) throws UnsupportedOperationException {
         if (handler == null && rawEventListeners.isEmpty()) {
             return;
         }
@@ -225,8 +227,16 @@ public class TorControlConnection implements TorControlCommands {
         for (Iterator<ReplyLine> i = events.iterator(); i.hasNext(); ) {
             ReplyLine line = i.next();
             int idx = line.msg.indexOf(' ');
-            String tp = line.msg.substring(0, idx).toUpperCase();
-            String rest = line.msg.substring(idx + 1);
+            String tp;
+            String rest;
+            try {
+                tp = line.msg.substring(0, idx).toUpperCase();
+                rest = line.msg.substring(idx + 1);
+            } catch (StringIndexOutOfBoundsException ex) {
+                throw new UnsupportedOperationException(
+                        "Event listened for is not yet implemented" , ex
+                );
+            }
             for (RawEventListener rawEventListener : rawEventListeners) {
                 rawEventListener.onEvent(tp, rest);
             }
@@ -552,7 +562,6 @@ public class TorControlConnection implements TorControlCommands {
      * <li>{@link TorControlCommands#EVENT_GUARD}: "GUARD"</li>
      * <li>{@link TorControlCommands#EVENT_STREAM_BANDWIDTH_USED}: "STREAM_BW"</li>
      * <li>{@link TorControlCommands#EVENT_CLIENTS_SEEN}: "CLIENTS_SEEN"</li>
-     * <li>{@link TorControlCommands#EVENT_NEWCONSENSUS}: "NEWCONSENSUS"</li>
      * <li>{@link TorControlCommands#EVENT_BUILDTIMEOUT_SET}: "BUILDTIMEOUT_SET"</li>
      * <li>{@link TorControlCommands#EVENT_GOT_SIGNAL}: "SIGNAL"</li>
      * <li>{@link TorControlCommands#EVENT_CONF_CHANGED}: "CONF_CHANGED"</li>
@@ -561,7 +570,6 @@ public class TorControlConnection implements TorControlCommands {
      * <li>{@link TorControlCommands#EVENT_CIRC_BANDWIDTH_USED}: "CIRC_BW"</li>
      * <li>{@link TorControlCommands#EVENT_TRANSPORT_LAUNCHED}: "TRANSPORT_LAUNCHED"</li>
      * <li>{@link TorControlCommands#EVENT_HS_DESC}: "HS_DESC"</li>
-     * <li>{@link TorControlCommands#EVENT_HS_DESC_CONTENT}: "HS_DESC_CONTENT"</li>
      * <li>{@link TorControlCommands#EVENT_NETWORK_LIVENESS}: "NETWORK_LIVENESS"</li>
      * </ul>
      * Any events not listed in the <b>events</b> are turned off; thus, calling
@@ -569,10 +577,15 @@ public class TorControlConnection implements TorControlCommands {
      *
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#setevents">control-spec: SETEVENTS</a>
      */
-    public void setEvents(List<String> events) throws IOException {
+    public void setEvents(List<String> events) throws IOException, IllegalArgumentException {
         StringBuffer sb = new StringBuffer(SETEVENTS);
+        String supportedEvents = Arrays.toString(EVENT_NAMES);
         for (Iterator<String> it = events.iterator(); it.hasNext(); ) {
-            sb.append(" ").append(it.next());
+            String event = it.next();
+            if (!supportedEvents.contains(event)) {
+                throw new IllegalArgumentException("Event: "+event+" is not yet implemented");
+            }
+            sb.append(" ").append(event);
         }
         sb.append("\r\n");
         sendAndWaitForResponse(sb.toString(), null);
