@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -69,7 +68,7 @@ public class TorControlConnection implements TorControlCommands {
         }
     }
 
-    static class ReplyLine {
+    protected static class ReplyLine {
 
         final String status;
         final String msg;
