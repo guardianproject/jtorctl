@@ -80,6 +80,9 @@ pages:
   artifacts:
     paths:
       - public
+  only:
+    - tags
+    # TODO figure out snapshot releases, this only works for tagged releases now
   script:
     - ./gradlew javadoc
     - test -d public || mkdir public
