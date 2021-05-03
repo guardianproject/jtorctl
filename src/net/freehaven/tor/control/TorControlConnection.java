@@ -1112,6 +1112,14 @@ public class TorControlConnection implements TorControlCommands {
     }
 
     /**
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#droptimeouts">control-spec: DROPTIMEOUTS</a>
+     */
+    public void dropTimeouts() throws IOException {
+        sendAndWaitForResponse(DROPTIMEOUTS + "\r\n", null);
+    }
+
+    /**
      * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#hsfetch">control-spec: HSFETCH</a>
      */
     public void hsFetch(String address) throws IOException {
@@ -1315,5 +1323,58 @@ public class TorControlConnection implements TorControlCommands {
      */
     public void delOnion(String hostname) throws IOException {
         sendAndWaitForResponse(DEL_ONION + " " + hostname + "\r\n", null);
+    }
+
+    /**
+     * Tells the connected Tor to add client-side v3 client auth
+     * credentials for the onion service with {@code hiddenServiceAddress}. The
+     * {@code privateKeyBlob} is the x25519 private key that should be
+     * used for this client, and {@code Nickname} is an optional
+     * nickname for the client.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_add">control-spec: ONION_CLIENT_AUTH_ADD</a>
+     */
+    public void onionClientAuthAdd(String hiddenServiceAddress, String privateKeyBlob, String nickname)
+	throws IOException {
+        sendAndWaitForResponse(ONION_CLIENT_AUTH_ADD + " " + hiddenServiceAddress
+			       + " x25519:" + privateKeyBlob
+			       + " ClientName=" + nickname + "\r\n", null);
+    }
+
+    /**
+     * Tells the connected Tor to add client-side v3 client auth
+     * credentials for the onion service with {@code hiddenServiceAddress}. The
+     * {@code privateKeyBlob} is the x25519 private key that should be
+     * used for this client.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_add">control-spec: ONION_CLIENT_AUTH_ADD</a>
+     */
+    public void onionClientAuthAdd(String hiddenServiceAddress, String privateKeyBlob)
+	throws IOException {
+        sendAndWaitForResponse(ONION_CLIENT_AUTH_ADD + " " + hiddenServiceAddress
+			       + " x25519:" + privateKeyBlob + "\r\n", null);
+    }
+
+    /**
+     * Tells the connected Tor to remove the client-side v3 client
+     * auth credentials for the onion service with {@code
+     * hiddenServiceAddress}.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_remove">control-spec: ONION_CLIENT_AUTH_REMOVE</a>
+     */
+    public void onionClientAuthRemove(String hiddenServiceAddress) throws IOException {
+        sendAndWaitForResponse(ONION_CLIENT_AUTH_REMOVE + " " + hiddenServiceAddress + "\r\n", null);
+    }
+
+    /**
+     * Tells the connected Tor to list all the stored client-side v3
+     * client auth credentials for {@code hiddenServiceAddress}. If no
+     * {@code hiddenServiceAddress} is provided, list all the stored
+     * client-side v3 client auth credentials.
+     *
+     * @see <a href="https://torproject.gitlab.io/torspec/control-spec/#onion_client_auth_view">control-spec: ONION_CLIENT_AUTH_VIEW</a>
+     */
+    public void onionClientAuthView(String hiddenServiceAddress) throws IOException {
+        sendAndWaitForResponse(ONION_CLIENT_AUTH_VIEW + " " + hiddenServiceAddress + "\r\n", null);
     }
 }

@@ -41,10 +41,14 @@ camelCased = {
     'PROTOCOLINFO': 'protocolInfo',
     'AUTHCHALLENGE': 'authChallenge',
     'DROPGUARDS': 'dropGuards',
+    'DROPTIMEOUTS': 'dropTimeouts',
     'HSFETCH': 'hsFetch',
     'HSPOST': 'hsPost',
     'ADD_ONION': 'addOnion',
     'DEL_ONION': 'delOnion',
+    'ONION_CLIENT_AUTH_ADD': 'onionClientAuthAdd',
+    'ONION_CLIENT_AUTH_REMOVE': 'onionClientAuthRemove',
+    'ONION_CLIENT_AUTH_VIEW': 'onionClientAuthView',
 }
 
 commands = []
