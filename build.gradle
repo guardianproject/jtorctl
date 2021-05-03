@@ -15,7 +15,7 @@ exec {
 ext.commitId = stdout.toString().trim()
 
 description = 'A Java library for controlling a Tor instance via its control port.'
-group = 'net.freehaven.tor.control'
+group = 'info.guardianproject'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
